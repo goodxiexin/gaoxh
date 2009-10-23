@@ -1,0 +1,12 @@
+  <div class='blog-right-bar'>
+    <h3>搜索你的好友</h3>
+    <%= text_field_tag 'search' %>
+    <%= observe_field :search,
+                      :complete  => "facebox.watchClickEvents();",
+                      :update    => "friends",
+                      :frequency => 1,
+                      :url       => search_friends_url(current_user),
+                      :with      => "'key='+$('search').value",
+                      :method    => :get  %>
+  </div>
+

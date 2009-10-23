@@ -1,0 +1,5 @@
+page.insert_html :bottom, "personal_photo_comments_#{@photo.id}", :partial => 'comment', :object => @comment
+if @user == current_user or @comment.poster == current_user
+  page << "facebox.watchClickEvent($('delete_comment_#{@comment.id}'));"
+end
+page << "$('personal_photo_comment_content_#{@photo.id}').value = '';"

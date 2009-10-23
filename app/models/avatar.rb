@@ -1,0 +1,3 @@
+class Avatar < Photo
+
+end

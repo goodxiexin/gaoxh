@@ -1,0 +1,2 @@
+module Album::CommentsHelper
+end

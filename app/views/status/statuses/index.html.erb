@@ -1,0 +1,29 @@
+<%= javascript_include_tag 'status' %>
+
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+<% end %>
+
+<div class='status-update'>
+  <h3 class="currentStatus">你正在干嘛？</h3>
+  <div class='status-edit'>
+  <% form_remote_for :status, :html => {:id => 'status_form'}  do |f| %>
+    <%= f.text_area 'content', :cols => 50, :rows => 3, :style => "margin:3px 6px" %>
+    <%= button_to_function '提交', "status_builder.submit()", :class => 'confirm-button' %><br/>
+  <% end %>
+  </div>
+  <div id="status_count" class="status-count"></div>
+  <div><%= emotion_link 'status_content' %></div>
+</div>
+ 
+<div class='status-list'>
+<ul id='statuses'>
+  <%= render :partial => 'status', :collection => @statuses %> 
+</ul>
+</div>
+
+<%= will_paginate @statuses %>
+
+<%= javascript_tag "
+  status_builder = new StatusBuilder($('status_form'), $('status_content'), $('status_count'), 140); 
+"%>

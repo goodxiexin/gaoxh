@@ -1,0 +1,51 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+<% end %>
+  
+<%= render :partial => 'menu' %>
+
+<div class='prev-next'>
+<%= "共#{@user.blogs.count}篇博客" %>
+<%= link_to 'prev', blog_url(@blog.prev) %> |
+<%= link_to 'next', blog_url(@blog.next) %> <br/>
+</div>
+
+<div class='blog-view'>
+  <div class='title'>
+    <h3 style="width: 75%;"><%= @blog.title %><span class='meta'><%= ftime @blog.created_at %></span></h3>
+    <div class='option'>
+      <% if @user == current_user %>
+      <%= link_to "编辑", edit_blog_url(@blog) %>
+      <%= facebox_confirm "删除", blog_url(@blog), {:msg => '你确定要删除这篇博客吗', :method => :delete} %>
+      <% end %>
+      <%= dig_link @blog %>
+      <%= link_to_remote '挖', :url => blog_digs_url(@blog) %>(<span id='dig_blog_<%= @blog.id %>'><%= @blog.digs_count %></span>)
+    </div>
+  </div>
+  <div class='view'>
+    <%= @blog.content %>
+  </div>
+  <div id='friend_tags'>
+  标签: <%= @blog.tags.map { |t| profile_link t.friend }.join(',') %>
+  </div>
+</div>
+
+<div id='blog_comments_<%= @blog.id %>'>
+  <%= render :partial => 'blog/comments/comment', :collection => @comments %>
+</div>
+
+<div class='msg-body'>
+  <% form_remote_for :comment, :url => blog_comments_url(@blog) do |f| %>
+  <div class='composer'>
+    <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
+    <%= f.text_area 'content', :rows => 5, :cols => 75, :id => "blog_comment_content_#{@blog.id}" %>
+  </div>
+  <div class='emotion'>
+    <%= emotion_link "blog_comment_content_#{@blog.id}" %>
+  </div>
+  <div class='button'>
+    <%= f.submit '提交', :class => 'confirm-button' %>
+    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
+  </div>
+  <% end %>
+</div>

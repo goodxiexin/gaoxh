@@ -1,0 +1,73 @@
+<% content_for :left do %>
+  <div style="text-align:center;padding: 5px">
+    <%= album_cover @event.album, :medium %><br/>
+  </div>
+  <% if @user == current_user and !@event.past%>
+    <%= render :partial => 'operations' %><br/>
+  <% end %>
+  <% if !@event.past %>
+    <%= render :partial => 'rsvp' %><br/>
+  <% end %>
+  <%= render :partial => 'other_invites' %>
+<% end %>
+
+<div class='event-show'>
+  <div class='event-title'>
+    <%= @event.title %>
+  </div>
+  <div class='info'>
+    <%= label_tag '', '主办人' %> <%= profile_link @event.poster %><br/>
+    <%= label_tag '', '游戏' %> <%= @event.game.name %><br/>
+    <% if @event.game_area %>
+      <%= label_tag '', '服务区' %> <%= @event.game_area.name %><br/>
+    <% end %>
+    <%= label_tag '', '服务器' %> <%= @event.game_server.name %><br/>
+    <%= label_tag '', '日期' %> <%= "从#{ftime @event.start_time}到#{ftime @event.end_time}" %>
+  </div>
+  <div class='detail'>
+    <h3>Description:</h3>
+    <%= @event.description %>
+  </div>
+  <div class='detail'>
+    <h3>Photos:</h3>
+    <% @album.photos[0..4].each do |p| %>
+      <%= photo_link p, :small %>
+    <% end %>
+    <div class='view-all'>
+      <%= link_to '查看全部', event_album_url(@album) %>
+    </div>
+  </div>
+  <div class='detail'>
+    <h3>确认会去的朋友:</h3>
+    <% @event.confirmed_participants.each do |p| %>
+        <%= avatar p %>
+    <% end %>
+    <div class='view-all'>
+      <%= link_to '查看全部', event_participations_url(@event, :type => 'confirmed') %>
+    </div>
+  </div>
+  <div class='comment'>
+    <h3>留言版:</h3>
+    <div>
+    <% if @participation %>
+      <% form_remote_for :comment, :url => event_comments_url(@event) do |f| %>
+      <div class='composer'>
+        <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
+        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_text_area(this, 140, $('comment_words_count'));" %>
+      </div>
+      <div class='button'>
+        <%= f.submit '提交', :class => 'confirm-button' %>
+        <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
+      </div>  
+      <% end %>
+      <div id="comment_words_count" class="status-count">0/140</div>
+      <div><%= emotion_link 'comment_content' %></div>
+    <% else %>
+      只有活动的参与者才能留言
+    <% end %>
+    <div class='view-all'><%= link_to '查看全部', event_comments_url(@event) %></div>
+  </div>
+  <div id='comments'>
+    <%= render :partial => 'event/comments/comment', :collection => @comments %>
+  </div>
+</div>

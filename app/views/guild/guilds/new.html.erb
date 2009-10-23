@@ -1,0 +1,23 @@
+<%= javascript_include_tag 'guild' %>
+
+<%= error_messages_for :guild, :header_message => '以下原因导致工会创建失败', :message => nil %>
+
+<div class='event-input'>
+<% form_for :guild, :html => {:id => "guild_form", :multipart => true} do |f| %>
+  <%= f.label '工会名字: ' %>
+  <%= f.text_field :name %><br/>
+  <%= f.label '游戏: ' %>
+  <%= collection_select :guild, :game_id, Game.all, :id, :name, {:prompt => '---'} %><br/>
+  <%= f.label '工会描述: ' %>
+  <%= f.text_area :description, :rows => 8 %><br/>
+  <% fields_for "photo" do |form| %>
+    <%= form.label '封面: ' %>
+    <%= form.file_field :uploaded_data %>
+  <% end %>
+  <%= button_to_function '提交',  "guild_builder.save('guild_form');"%>   
+<% end %>
+</div>
+
+<%= javascript_tag "
+  var guild_builder = new GuildBuilder();
+" %>

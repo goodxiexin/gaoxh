@@ -1,0 +1,62 @@
+<% content_for :left do %>
+  <div class='guild-cover'>
+    <%= guild_album_cover @guild, :medium %><br/>
+  </div>
+  <%= render :partial => 'guild_menu' %><br/>
+  <%= render :partial => 'guild_info' %>
+<% end %>
+
+<% content_for :right do %>
+  <%= render :partial => 'guild_topics' %><br/>
+  <%= render :partial => 'guild_events' %><br/>
+  <%= render :partial => 'guild_friends' %>
+<% end %>
+
+<div class='event-show'>
+  <div class='event-title'>
+    "<%= @guild.name %>" 简介
+  </div>
+  <div class='info'>
+    <%= @guild.description %>
+  </div>
+  <div class='detail'>
+    <h3>照片</h3>
+    <table><tr>
+    <% @album.photos[0..7].each do |p| %>
+      <td><%= link_to (image_tag p.public_filename(:small), :onmouseover => "this.setStyle({ border: '3px solid #cbcbcb', padding: '0px'});", :onmouseout => "this.setStyle({ border: '1px solid #cbcbcb', padding:'2px'});", :style => "border:1px solid #cbcbcb; padding: 2px;"), guild_photo_url(p)%></td>
+    <% end %>
+    </tr></table>
+    <div class='view-all'>
+      <%= link_to '查看全部', guild_photos_url(:album_id => @album.id) %>
+    </div>
+  </div>
+  <div class='detail'>
+    <h3>成员</h3>
+    <table><tr/>
+    <% @guild.members[0..7].each do |m| %>
+      <td>
+        <%= user_icon m %><br/>
+        <%= link_to_user m %>
+      </td>
+    <% end %>
+    </tr></table>
+    <div class='view-all'>
+      <%= link_to '查看全部', guild_memberships_url(@guild, :type => 0) %>
+    </div>
+  </div>
+  <div class='wall'>
+    <h3>留言版</h3>
+    <% if @membership %>
+      <%= render :partial => 'guild/wall_messages/new' %>
+    <% else %>
+       只有会员才能留言
+    <% end %>
+    <div class='view-all'>
+      <%= link_to '查看全部', guild_wall_messages_url(@guild) %>
+    </div>
+  </div>
+  <div id='wall_messages'>
+    <%= render :partial => 'guild/wall_messages/wall_message', :collection => @wall_messages %>
+  </div> 
+</div>
+

@@ -1,0 +1,3 @@
+class EventPhoto < Photo
+
+end

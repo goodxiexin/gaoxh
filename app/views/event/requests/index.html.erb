@@ -1,0 +1,12 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+<% end %>
+
+<%= render :partial => 'event/participations/menu' %>
+
+<div id='participations'>
+  <%= render :partial => 'request', :collection => @requests %>
+</div>
+
+<%= will_paginate @requests %>
+

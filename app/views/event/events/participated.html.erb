@@ -1,0 +1,18 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+  <div class='blog-right-bar'>
+    <div class='part'>
+      <h3>活动分类: </h3>
+      <% game_options = [['全部', nil]] %>
+      <% @user.games.each {|g| game_options << [g.name, g.id] } %>
+      <%= select_tag '', options_for_select(game_options, params[:game_id].to_i), :onchange => "window.location.href = '#{participated_events_url(:id => @user.id)}' + '&game_id=' + this.value;" %>
+    </div>
+  </div>
+<% end %>
+
+<%= render :partial => 'event/menu' %>
+
+<div id='events'>
+  <%= render :partial => 'event/event_items', :object => @events %>
+</div>
+

@@ -1,0 +1,38 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+<% end %>
+
+<%= render :partial => 'menu' %><br/>
+
+<ul>
+  <h3>游戏分类</h3>
+  <% @profile.games.each do |game| %>
+    <li><%= link_to game.name, friends_url(:term => 1, :game_id => game.id) %></li>
+  <% end %>
+</ul>
+
+<ul>
+  <h3>工会分类</h3>
+</ul>
+
+<ul>
+  <h3><%= link_to "所有好友(#{@user.friends.count})", friends_url(:term => 0) %></h3>
+</ul>
+
+<div class='friendListHead'>
+  <h3>所有好友</h3>
+  <div class='friendFinder'>
+    <%= text_field_tag 'search', '搜索你的好友...', :onfocus => "this.clear();" %>
+    <%= observe_field :search,
+                      :complete  => "facebox.watchClickEvents();",
+                      :update    => "friends",
+                      :frequency => 1,
+                      :url       => search_friends_url(current_user),
+                      :with      => "'key='+$('search').value",
+                      :method    => :get  %>
+  </div>
+</div>
+
+<div id="friends">
+  <%= render :partial => 'friends', :object => @friends %>
+</div>

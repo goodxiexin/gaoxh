@@ -1,0 +1,14 @@
+<% hot_topics = @guild.forum.hot_topics[0..3] %>
+<div class='fby'>
+  <h3>最近的热门话题<%= link_to_function 'fold', "$('side_topics').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='side_topics'>
+    <% hot_topics.each do |topic| %>
+      <%= link_to_topic topic %>
+      <span style="text-align:right;color:grey;font-size:9px"><%= link_to_user topic.user %></span><br/>
+    <% end %>
+  </div>
+  <div class='view-more' style="text-align:right">
+    <%= link_to 'more..', forum_url(@guild.forum)  %>
+  </div>
+</div>
+

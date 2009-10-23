@@ -1,0 +1,20 @@
+1. install Restful_authentication
+   see http://avnetlabs.com/rails/restful-authentication-with-rails-2
+
+2. setup action mailer
+
+3. install anotated model
+   see http://github.com/ctran/annotate_models
+
+4. setup ar_sendmail
+   see http://github.com/adzap/ar_mailer
+
+5. setup in place editor
+
+6. setup validation image
+
+7. acts_as_list
+
+8. setup attachment_fu
+
+9. acts_as_emotion_text (written by myself)

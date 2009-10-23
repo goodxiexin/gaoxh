@@ -1,0 +1,22 @@
+<div class='fby'>
+  <h3>menu: <%= link_to_function 'fold', "$('guild_menu').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='guild_menu'>
+    <% if !@request.blank? %>
+      <span class='subtitle'>你已经申请加入这个工会了，请耐心等待会长回复</span>
+    <% elsif !@invitation.blank? %>
+      <span class='subtitle'>你被邀请加入这个工会，点击<%= link_to '这里', edit_guild_invitation_url(@guild, @invitation, :show => 1), :rel => 'facebox' %>回复</span>
+    <% elsif @membership.blank? %>
+      <span class='subtitle'>你还没加入这个工会里，是否<%= link_to '加入', new_guild_request_url(@guild, :show => 1), :rel => 'facebox' %></span>
+    <% elsif @membership.status == 1 %>
+      <li><%= link_to '编辑工会', edit_guild_url(@guild) %></li>
+      <li><%= link_to '邀请更多人', new_guild_invitation_url(@guild) %></li>
+      <li><%= link_to '到论坛去看看', forum_url(@guild.forum) %></li>
+    <% elsif @membership.status == 2 %>
+      <li><%= link_to '到论坛去看看', forum_url(@guild.forum) %></li>
+      <li><%= link_to '发信给会长', new_mail_url(:receiver_id => @guild.president_id) %></li>
+    <% elsif @membership.status == 3 %>
+      <li><%= link_to '到论坛去看看', forum_url(@guild.forum) %></li>
+      <li><%= link_to '发信给会长', new_mail_url(:receiver_id => @guild.president_id) %></li>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class='fby'>
+  <h3>友好工会: <%= link_to_function 'fold', "$('side_friends').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='side_friends'>
+    <table>
+      <% @guild.friends[0..2].each do |f| %>
+        <tr>
+          <td><%= image_tag 'default_guild_small.jpg', :style => "width: 50px" %></td>
+          <td><%= link_to f.name, guild_url(f) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class='view-all'>
+    <%= link_to 'more..', guild_friends_url(@guild), :rel => 'facebox' %>
+  </div>
+</div>
+

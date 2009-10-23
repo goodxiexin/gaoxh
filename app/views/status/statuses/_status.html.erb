@@ -1,0 +1,19 @@
+<li>
+  <span class='float-right'><%= facebox_confirm 'x', status_url(status), {:method => :delete, :msg => '你确定要删除这条状态吗?'}, {:id => "delete_status_#{status.id}"} %></span>
+  <%= avatar status.user %>
+  <div class='status-content'>
+    <p class='title'><span class='time'><%= ftime status.created_at %></span></p>
+    <p class='body'>
+      <%= status.content %>
+      <%= link_to_function "#{status.comments_count}条回复", "toggle_comments('" %>
+    </p>
+    <div class='comment-list' id='comments_for_status_<%= status.id %>'></div>
+    <div class='reply' style="display:none">
+      <% form_remote_for :comment, :url => status_comments_url(status) do |f| %>
+        <span><%= avatar current_user %></span>
+        <%= f.text_area 'content', :rows => 1, :cols => 60 %>
+        <%= f.submit '提交' %>
+      <% end %>
+    </div>
+  </div>
+</li>

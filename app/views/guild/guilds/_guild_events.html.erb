@@ -1,0 +1,18 @@
+<% events = @guild.events %>
+<div class='fby'>
+  <h3>最近的活动(<%= events.count %>个): <%= link_to_function 'fold', "$('side_events').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='side_events'>
+    <table>
+    <% events[0..2].each do |event| %>
+      <tr>
+        <td><%= event_album_cover event, :small %></td>
+        <td><%= link_to event.title, event_url(event) %><br/><span class='fby-tiny'><%= ftime event.created_at %></span></td>
+      </tr>
+    <% end %>
+    </table>
+  </div>
+  <div class='view-more' style="text-align:right">
+    <%= link_to 'more..', guild_events_url(@guild)  %>
+  </div>
+</div>
+

@@ -1,0 +1,21 @@
+<%= render :partial => 'guild/menu' %>
+
+<% content_for :right do %>
+<div class='blog-right-bar'>
+  <div class='part'>
+    <h3>搜索</h3>
+    <%= text_field_tag 'search' %>
+    <%= observe_field :search,
+                      :complete => "facebox.watchClickEvents();",
+                      :update => 'guilds',
+                      :url => search_guilds_url(:type => 2),
+                      :frequency => 1,
+                      :with => "'key='+$('search').value",
+                      :method => :get %>
+  </div>
+</div>
+<% end %>
+
+<div id='guilds'>
+  <%= render :partial => 'guild/guilds', :object => @guilds %>
+</div>

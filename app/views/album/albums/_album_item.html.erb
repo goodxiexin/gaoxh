@@ -1,0 +1,19 @@
+<div class='album-item'>
+  <div class='album-cover'>
+    <%= album_cover album_item %>
+  </div>
+  <div class='album-info'>
+    <h4><%= album_link album_item %>(<%= album_item.photos_count %>)</h4>
+    <p>于<%= ftime album_item.created_at %>更新</p>
+    <p>描述: <%= album_item.description %></p>
+  </div>
+  <ul class='album-sample'>
+    <% album_item.recent_photos(3).each do |p| %>
+      <li><%= photo_link p %></li>
+    <% end %>  
+  </ul>
+  <div class='album-option'>
+    <%= link_to '编辑', edit_personal_album_url(album_item), :rel => 'facebox' %>
+    <%= link_to '删除', confirm_destroy_personal_album_url(album_item), :rel => 'facebox' %> 
+  </div>
+</div>

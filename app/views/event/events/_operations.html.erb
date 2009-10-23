@@ -1,0 +1,9 @@
+<div class='fby'>
+  <h3>menu: <%= link_to_function 'fold', "$('event_menu').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='event_menu'>
+    <li><%= link_to '编辑活动', edit_event_url(@event) %></li>
+    <li><%= link_to '邀请更多人', new_event_invitation_url(@event) %></li> 
+    <li><%= facebox_confirm '放所有人鸽子', event_url(@event), {:msg => '你确定要取消这次活动吗?', :method => :delete} %></li>
+  </div>
+</div>
+

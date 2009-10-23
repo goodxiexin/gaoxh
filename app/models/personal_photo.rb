@@ -1,0 +1,3 @@
+class PersonalPhoto < Photo
+
+end

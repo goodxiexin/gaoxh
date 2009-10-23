@@ -1,0 +1,22 @@
+<% if @participation %>
+  <% form_remote_for :comment, :url => event_comments_url(@event) do |f| %>
+      <div class='composer'>
+        <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
+        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_text_area(this, 140, $('comment_words_count'));" %>
+      </div>
+      <div class='button'>
+        <%= f.submit '提交', :class => 'confirm-button' %>
+        <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
+      </div>
+      <% end %>
+      <div id="comment_words_count" class="status-count">0/140</div>
+      <div><%= emotion_link 'comment_content' %></div>
+<% else %>
+  <%= "你必须加入活动才能留言，点击#{ link_to '这里', event_url(@event) }查看活动详情" %>
+<% end %>
+
+<div id='comments'>
+  <%= render :partial => 'comment', :collection => @comments %>
+</div>
+
+<%= will_paginate @comments %>
