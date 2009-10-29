@@ -1,4 +1,4 @@
-class Event::CommentsController < Base::CommentsController
+class Event::CommentsController < CommentsController
 
   layout 'app'
 

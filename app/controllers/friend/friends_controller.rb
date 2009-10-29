@@ -4,15 +4,18 @@ class Friend::FriendsController < ApplicationController
 
   before_filter :login_required, :setup
 
+	before_filter :not_friend_required, :only => [:new]
+	
   def index
     case params[:term].to_i
     when 0
       @friends = current_user.friends.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
     when 1
       game = Game.find(params[:game_id])
-      @friends = current_user.friends.find_all {|f| f.profile.games.include?(game) }.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
+      @friends = current_user.friends.find_all {|f| f.games.include?(game) }.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
     when 2
-      @friends = current_user.friends.paginate :page => params[:page], :per_page => 10, :order => 'created_at DESC'
+			guild = Guild.find(params[:guild_id])
+      @friends = current_user.friends.find_all {|f| f.participated_guilds.include?(guild) }.paginate :page => params[:page], :per_page => 10, :order => 'created_at DESC'
     end
   end
 
@@ -39,13 +42,21 @@ class Friend::FriendsController < ApplicationController
 protected
 
   def setup
-    @user = current_user
-    @profile = @user.profile
-    if ["destroy", "new"].include? params[:action]
-      @friend = @user.friends.find(params[:id])
-    end
+    if ["destroy"].include? params[:action]
+      @friend = current_user.friends.find(params[:id])
+    elsif ["new"].include? params[:action]
+			@user = User.find(params[:id])
+			@profile = @user.profile
+		end
   rescue
     not_found
   end
 
+	def not_friend_required
+		if @user.has_friend? current_user
+			redirect_to profile_url(current_user.profile)
+		end
+	end
+
 end
+

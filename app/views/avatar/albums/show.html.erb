@@ -50,29 +50,23 @@
 <% end %>
 </table>
 
-<% if @user == current_user %>
-  <%= in_place_text_field @album, :description, {}, {:url => avatar_album_url(@album, :type => 'description'), :name => 'album[description]', :rows => 2, :cols => 90} %> 
-<% else %>
-  <%= @album.description %>
-<% end %>
-
 <p class="albumTime">
   <span class="time-update"><%= ftime @album.updated_at %>更新</span><br/>
   <span class="time-create"><%= ftime @album.created_at %>创建</span>
 </p>
 
-<div id='avatar_album_comments_<%= @album.id %>'>
-  <%= render :partial => 'avatar/comments/comment', :collection => @comments %>
+<div id='comments'>
+  <%= render :partial => 'avatar/album_comments/comment', :collection => @comments %>
 </div>
 
 <div class='msg-body'>
   <% form_remote_for :comment, :url => avatar_album_comments_url(@album) do |f| %>
   <div class='composer'>
     <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-    <%= f.text_area 'content', :rows => 5, :cols => 75, :id => "avatar_album_comment_content_#{@album.id}" %>
+    <%= f.text_area 'content', :rows => 5, :cols => 75 %>
   </div>
   <div class='emotion'>
-    <%= emotion_link "avatar_album_comment_content_#{@album.id}" %>
+    <%= emotion_link "comment_content" %>
   </div>
   <div class='button'>
     <%= f.submit '提交', :class => 'confirm-button' %>

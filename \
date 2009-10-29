@@ -1,0 +1,116 @@
+HomeManager = Class.create({
+
+	initialize: function(){
+		this.loading_image = new Image();
+		this.loading_image.src = '/images/loading.gif';
+		this.feeds_div = $('feed_list');
+		this.more_feeds_div = $('more_feed');
+		this.time_range_id = 1;
+	},
+
+	loading: function(div){
+		div.innerHTML = "<img src='" + this.loading_image.src + "'/>";
+	},
+
+	no_feeds: function(){
+		this.more_feeds_div.innerHTML = '没有新鲜事了'
+	},
+
+	// hook function
+	set_time_range_id: function(id){
+		this.time_range_id = id;
+	},
+
+	show_all_feeds: function(){
+    this.loading(this.feeds_div);
+		this.time_range_id = 0;
+    new Ajax.Request('/home/all_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+	},
+
+	more_feeds: function(){
+		this.loading(this.more_feeds);
+    new Ajax.Request('/home/more_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+				this.time_range_id++;
+      }.bind(this)
+    });
+	},
+
+	show_status_feeds: function(){
+		this.loading();
+		new Ajax.Request('/home/status_feeds', {
+			method: 'get',
+			onSuccess: function(transport){
+				this.feeds_div.innerHTML = transport.responseText;
+			}.bind(this)
+		});
+	},
+
+	show_blog_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/blog_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  },
+
+  show_video_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/video_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  },
+
+  show_photo_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/photo_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  },
+
+  show_event_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/event_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  },
+
+  show_guild_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/guild_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  },
+
+  show_poll_feeds: function(){
+    this.loading();
+    new Ajax.Request('/home/poll_feeds', {
+      method: 'get',
+      onSuccess: function(transport){
+        this.feeds_div.innerHTML = transport.responseText;
+      }.bind(this)
+    });
+  }
+	
+});

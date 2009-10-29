@@ -1,0 +1,74 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+<% end %>
+
+<% subject = get_subject @user %>
+<%= link_to "热门相片", hot_personal_photos_url(:id => @user.id) %> |
+<%= link_to "最新相册", recent_personal_albums_url(:id => @user.id) %> |
+<%= link_to "#{subject}的相册", personal_albums_url(:id => @user.id) %> |
+<% if @user == current_user %>
+  <%= link_to "好友相册", album_feeds_url %> |
+<% end %>
+<%= link_to "#{subject}的相关相片", relative_personal_photos_url(:id => @user.id) %> |
+<% if @user == current_user %>
+  <%= link_to "上传照片", new_personal_photo_url(:album_id => @album.id) %> |
+  <%= link_to "新专辑", new_personal_album_url, :rel => 'facebox' %>
+<% end %> 
+
+<div class='crumb'>
+<% subject = get_subject @user %>
+<%= link_to "#{subject}的照片", personal_albums_url(:id => @user.id) %> -> <%= "#{@album.title}" %>
+</div>
+
+<% i = 0 %>
+<table class='photo-list'>
+<% @album.photos.each do |p| %>
+  <% if i == 0 %>
+    <tr>
+  <% end %>
+  <td>
+    <%= photo_link p %><p>
+    <% if @user == current_user %>
+      <%= link_to '编辑', edit_personal_photo_url(p), :rel => 'facebox' %>|
+      <%= facebox_confirm '删除', personal_photo_url(p), {:msg => "你确定要删除这张照片吗?", :method => :delete} %>  
+    <% end %>
+  </td>
+  <% i = i + 1 %>
+  <% if i== 4 %>
+    <% i = 0 %>
+    <tr/>
+  <% end %>
+<% end %>
+</table>
+
+<% if @user == current_user %>
+  <%= in_place_text_field @album, :description, {:empty_text => '点击添加相册描述', :url => update_description_personal_album_url(@album), :name => 'album[description]', :rows => 2, :cols => 90} %>
+<% else %>
+  <%= @album.description %>
+<% end %>
+
+<p class="albumTime">
+  <span class="time-update"><%= ftime @album.updated_at %>更新</span><br/>
+  <span class="time-create"><%= ftime @album.created_at %>创建</span>
+</p>
+
+<div id='comments'>
+  <%= render :partial => 'personal_album/album_comments/comment', :collection => @comments %>
+</div>
+
+<div class='msg-body'>
+  <% form_remote_for :comment, :url => personal_album_comments_url(@album) do |f| %>
+  <div class='composer'>
+    <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
+    <%= f.text_area 'content', :rows => 5, :cols => 75 %>
+  </div>
+  <div class='emotion'>
+    <%= emotion_link "comment_content" %>
+  </div>
+  <div class='button'>
+    <%= f.submit '提交', :class => 'confirm-button' %>
+    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
+  </div>
+  <% end %>
+</div>
+

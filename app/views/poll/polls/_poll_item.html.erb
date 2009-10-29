@@ -5,7 +5,7 @@
   </div>
   <div class='poll-body'>
     <div class='poll-title'>
-       <%= poll_item.name %><span class='meta'><br/><%= distance_of_time_in_words_to_now poll_item.created_at %> ago</span>
+       <%= poll_link poll_item %><span class='meta'><br/><%= distance_of_time_in_words_to_now poll_item.created_at %> ago</span>
     </div>
     <div class='poll-content'>
       <ul class='poll-sample'>
@@ -16,6 +16,6 @@
     </div>
   </div>
   <div class='poll-vote'>
-    <%= poll_item.subscribers_count %>人参加了投票<br/>
+    <%= poll_item.voters_count %>人参加了投票<br/>
   </div>
 </div>

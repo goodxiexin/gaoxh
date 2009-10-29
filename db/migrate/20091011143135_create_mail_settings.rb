@@ -13,8 +13,9 @@ class CreateMailSettings < ActiveRecord::Migration
       t.boolean :comment_my_status, :default => true
       t.boolean :comment_same_status_after_me, :default => true
 
-      # wall message
-      t.boolean :message_me, :default => true
+      # profile
+			t.boolean :comment_my_profile, :default => true
+			t.boolean :comment_same_profile_after_me, :default => true
 
       # poke
       t.boolean :poke_me, :default => true
@@ -22,6 +23,8 @@ class CreateMailSettings < ActiveRecord::Migration
       # photo
       t.boolean :tag_me_in_photo, :default => true
       t.boolean :tag_my_photo, :default => true
+			t.boolean :comment_my_album, :default => true
+			t.boolean :comment_same_album_after_me, :default => true
       t.boolean :comment_my_photo, :default => true
       t.boolean :comment_photo_contains_me, :default => true
       t.boolean :comment_same_photo_after_me, :default => true
@@ -44,17 +47,17 @@ class CreateMailSettings < ActiveRecord::Migration
       t.boolean :change_place_of_event, :default => true
       t.boolean :cancel_event, :default => true
       t.boolean :request_to_attend_my_event, :default => true
-      t.boolean :message_me_on_event_wall, :default => true
-      t.boolean :leave_message_on_my_event_wall, :default => true
+      t.boolean :comment_my_event, :default => true
+      t.boolean :comment_same_event_after_me, :default => true
 
       # guild
+			t.boolean	:change_name_of_guild, :default => true
       t.boolean :invite_me_to_guild, :default => true
       t.boolean :promotion_to_president, :default => true
       t.boolean :promotion_to_veteran, :default => true
       t.boolean :request_to_attend_my_guild, :default => true
       t.boolean :reply_my_post, :default => true
-      t.boolean :message_me_on_guild_wall, :default => true
-      t.boolean :change_name_of_guild, :default => true
+      t.boolean :comment_same_guild_after_me, :default => true
 
       # poll
       t.boolean :invite_me_to_poll, :default => true

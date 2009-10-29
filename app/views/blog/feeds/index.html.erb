@@ -1,0 +1,10 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %><br/>
+<% end %>
+
+<%= render :partial => 'blog/menu' %>
+
+<div id='blogs'>
+  <%= render :partial => 'blog_items', :object => @feed_items %>
+</div>
+

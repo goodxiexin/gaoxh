@@ -2,7 +2,7 @@
   <%= render :partial => '/app_menu' %>
 <% end %>
   
-<%= render :partial => 'menu' %>
+<%= render :partial => 'blog/menu' %>
 
 <div class='prev-next'>
 <%= "共#{@user.blogs.count}篇博客" %>
@@ -19,7 +19,6 @@
       <%= facebox_confirm "删除", blog_url(@blog), {:msg => '你确定要删除这篇博客吗', :method => :delete} %>
       <% end %>
       <%= dig_link @blog %>
-      <%= link_to_remote '挖', :url => blog_digs_url(@blog) %>(<span id='dig_blog_<%= @blog.id %>'><%= @blog.digs_count %></span>)
     </div>
   </div>
   <div class='view'>

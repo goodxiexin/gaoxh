@@ -16,6 +16,10 @@ class Event::ParticipationsController < ApplicationController
       @participants = @event.maybe_participants.paginate :page => params[:page], :per_page => 20
     when 2
       @participants = @event.declined_participants.paginate :page => params[:page], :per_page => 20
+		when 3
+			@participants = @event.invitees.paginate :page => params[:page], :per_page => 20
+		when 4
+			@participants = @event.requestors.paginate :page => params[:page], :per_page => 20
     end
   end
 

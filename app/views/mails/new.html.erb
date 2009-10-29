@@ -1,0 +1,34 @@
+<% content_for :left do %>
+	<%= render :partial => '/app_menu' %>
+<% end %>
+
+<%= javascript_include_tag 'mailbox' %>
+<%= render :partial => 'menu' %>
+
+<ul id='mail_info'></ul>
+<table>
+<% form_for :mail, :url => mails_url, :html => {:onsubmit => "return validate_mail();"} do |form| %>
+  <tr>
+    <td><%= form.label 'recipient: ' %></td>
+    <td><%= auto_complete_text_field :mail, :recipients, '/mails/auto_complete_for_mail_recipients', {}, {:tokens => ','} %></td>
+  </tr>
+  <tr>
+    <td><%= form.label 'title: ' %></td>
+    <td><%= form.text_field 'title' %></td>
+  </tr>
+  <tr>
+    <td><%= form.label 'content: ' %></td>
+    <td><%= form.text_area 'content', :rows => 8, :cols => 35 %></td>
+  </tr>
+  <tr>
+    <td></td><td><%= form.submit 'send' %></td>
+  </tr>
+<% end %>
+</table>
+
+<% unless @recipient.blank? %>
+<script type="text/javascript">
+  $('mail_recipients').value = '<%= @recipient.login %>';
+  $('mail_recipients').disabled = true;     
+</script>
+<% end %>

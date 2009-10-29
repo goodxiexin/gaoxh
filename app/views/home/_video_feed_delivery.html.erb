@@ -1,0 +1,11 @@
+<% delivery = video_feed_delivery %>
+<% video = delivery.feed_item.originator %>
+<div id='feed_delivery_<%= delivery.id %>'>
+  <div><%= avatar video.poster %></div>
+  <div>
+    <%= profile_link video.poster %>发布了视频<%= video_link video %>
+  </div>
+  <div><%= video.link %> </div>
+	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
+  <div><%= ftime delivery.created_at %></div>
+</div>

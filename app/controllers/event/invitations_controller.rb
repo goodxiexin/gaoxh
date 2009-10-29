@@ -4,13 +4,9 @@ class Event::InvitationsController < ApplicationController
 
   before_filter :login_required, :setup
 
-  before_filter :owner_required, :only => [:search, :index, :new, :create_multiple]
+  before_filter :owner_required, :only => [:new, :create_multiple]
 
   before_filter :invitee_required, :only => [:edit, :update]
-
-  def index
-    @invitations = @event.invitations.paginate :page => params[:page], :per_page => params[:per_page]
-  end
 
   def new
     @friends = @user.friends
@@ -37,7 +33,7 @@ class Event::InvitationsController < ApplicationController
 protected
 
   def setup
-    if ['index', 'new', 'search'].include? params[:action]
+    if ['new', 'search'].include? params[:action]
       @event = Event.find(params[:event_id])
       @user = @event.poster
     elsif ['create_multiple'].include? params[:action]
@@ -49,8 +45,6 @@ protected
       @user = @event.poster
       @invitation = @event.invitations.find(params[:id])
     end
-  rescue
-    not_found
   end
 
   def invitee_required

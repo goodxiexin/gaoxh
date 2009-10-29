@@ -10,15 +10,17 @@ class Event < ActiveRecord::Base
 
   belongs_to :game_area
 
-  has_many :comments, :as => 'commentable', :order => 'created_at DESC', :dependent => :destroy
+	acts_as_commentable :order => 'created_at DESC'
+
+	acts_as_global_resources :conditions => "start_time > '#{Time.now.to_s(:db)}'", :hot_order => "confirmed_count DESC"
 
   has_many :participations, :dependent => :destroy
 
   has_many :invitations, :class_name => 'Participation', :conditions => {:status => 0}, :dependent => :destroy
   
-  has_many :requests, :class_name => 'Participation', :conditions => ["status = 1 OR status = 2"], :dependent => :destroy
+  has_many :requests, :class_name => 'Participation', :conditions => {:status => [1,2]}, :dependent => :destroy
 
-  has_many :participants, :through => :participations, :conditions => "status = 3 or status = 4 or status = 5"
+  has_many :participants, :through => :participations, :conditions => "participations.status = 3 or participations.status = 4 or participations.status = 5"
 
   has_many :invitees, :through => :invitations, :source => 'participant'
 
@@ -29,6 +31,8 @@ class Event < ActiveRecord::Base
   has_many :maybe_participants, :through => :participations, :source => 'participant', :conditions => "participations.status = 4"
 
   has_many :declined_participants, :through => :participations, :source => 'participant', :conditions => "participations.status = 5"
+
+	has_many :feed_items, :as => 'originator', :dependent => :destroy
 
   validate do |event|
     event.errors.add_to_base("标题不能为空") if event.title.blank?
@@ -49,22 +53,8 @@ class Event < ActiveRecord::Base
     start_time < Time.now
   end
 
-  named_scope :hot, lambda { |game_id|
-    if game_id.blank?
-      cond = {:conditions => ["start_time > ?", Time.now.to_s(:db)]}
-    else
-      cond = {:conditions => ["start_time > ? AND game_id = ", Time.now.to_s(:db), game_id]}    
-    end
-    {:order => "confirmed_count DESC"}.merge cond
-  }
-
-  named_scope :recent, lambda { |game_id|
-    if game_id.blank?
-      cond = {:conditions => ["start_time > ?", Time.now.to_s(:db)]}
-    else
-      cond = {:conditions => ["start_time > ? AND game_id = ", Time.now.to_s(:db), game_id]}
-    end
-    {:order => "created_at DESC"}.merge cond
-  }
+	def participantable? user
+		poster == user || privilege == 1 || (privilege == 2 and poster.has_friend? user)
+	end
   
 end

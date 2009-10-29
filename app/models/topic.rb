@@ -10,11 +10,13 @@ class Topic < ActiveRecord::Base
 
   has_many :posts, :dependent => :delete_all
 
+  belongs_to :last_post, :class_name => 'Post'
+
   validate do |topic|
     topic.errors.add_to_base('标题不能为空') if topic.subject.blank?
-    topic.errors.add_to_base('标题最长100个字符') if topic.subject and topic.subject.length > 100
+    topic.errors.add_to_base('标题最长100个字符') if topic.subject.length > 100
     topic.errors.add_to_base('内容不能为空') if topic.content.blank?
-    topic.errors.add_to_base('内容最长10000个字符') if topic.content and topic.content.length > 10000
+    topic.errors.add_to_base('内容最长10000个字符') if topic.content.length > 10000
   end
 
 end

@@ -2,7 +2,7 @@
   <%= render :partial => '/app_menu' %>
 <% end %>
 
-<%= render :partial => 'menu' %>
+<%= render :partial => 'video/menu' %>
 
 <div class='prev-next'>
 <%= "共#{@user.videos.count}篇视频" %>
@@ -18,8 +18,8 @@
       <%= link_to "编辑", edit_video_url(@video) %>
       <%= facebox_confirm "删除", video_url(@video), {:msg => '你确定要删除这个视频吗', :method => :delete} %>
       <% end %>
-      <%= link_to_remote '挖', :url => video_digs_url(@video) %>(<span id='dig_video_<%= @video.id %>'><%= @video.digs_count %></span>)
-    </div>
+			<%= dig_link @video %>
+		</div>
   </div>
   <div class='view'>
     <%= @video.link %>

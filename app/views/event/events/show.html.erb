@@ -43,7 +43,7 @@
         <%= avatar p %>
     <% end %>
     <div class='view-all'>
-      <%= link_to '查看全部', event_participations_url(@event, :type => 'confirmed') %>
+      <%= link_to '查看全部', event_participations_url(@event, :type => 0) %>
     </div>
   </div>
   <div class='comment'>
@@ -53,7 +53,7 @@
       <% form_remote_for :comment, :url => event_comments_url(@event) do |f| %>
       <div class='composer'>
         <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_text_area(this, 140, $('comment_words_count'));" %>
+        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_textarea(this, 140, $('comment_words_count'));" %>
       </div>
       <div class='button'>
         <%= f.submit '提交', :class => 'confirm-button' %>

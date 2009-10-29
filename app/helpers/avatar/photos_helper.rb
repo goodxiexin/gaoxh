@@ -1,0 +1,2 @@
+module Avatar::PhotosHelper
+end

@@ -4,15 +4,17 @@
   <%= render :partial => '/app_menu' %>
 <% end %>
 
+<%= render :partial => 'status/menu' %>
+
 <div class='status-update'>
   <h3 class="currentStatus">你正在干嘛？</h3>
   <div class='status-edit'>
   <% form_remote_for :status, :html => {:id => 'status_form'}  do |f| %>
-    <%= f.text_area 'content', :cols => 50, :rows => 3, :style => "margin:3px 6px" %>
+    <%= f.text_area 'content', :cols => 50, :rows => 3, :onkeyup => "limit_words_of_textarea(this, 140, 'words_count');" %>
     <%= button_to_function '提交', "status_builder.submit()", :class => 'confirm-button' %><br/>
   <% end %>
   </div>
-  <div id="status_count" class="status-count"></div>
+  <div id="words_count" class="status-count">0/140</div>
   <div><%= emotion_link 'status_content' %></div>
 </div>
  
@@ -25,5 +27,5 @@
 <%= will_paginate @statuses %>
 
 <%= javascript_tag "
-  status_builder = new StatusBuilder($('status_form'), $('status_content'), $('status_count'), 140); 
+  status_builder = new StatusBuilder(); 
 "%>

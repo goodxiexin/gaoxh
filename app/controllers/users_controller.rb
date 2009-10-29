@@ -12,7 +12,12 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    return if User.find_by_email(params[:user][:email])
+    if User.find_by_email(params[:user][:email])
+			render :update do |page|
+				page << "$('email_info').innerHTML = '被占用';"
+			end
+			return
+		end
     @user = User.new(params[:user])
     @user.save!
     params[:cs].each do |args|
@@ -20,7 +25,7 @@ class UsersController < ApplicationController
     end unless params[:cs].blank?
     flash[:notice] = "Thanks for signing up! Please check your email to activate your account before you log in"
     render :update do |page|
-      page.redirect_to root_url
+      page.redirect_to '/login'
     end
   rescue ActiveRecord::RecordInvalid
     flash.now[:notice] = "There was a problem creating your account"

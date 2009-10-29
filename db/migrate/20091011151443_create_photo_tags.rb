@@ -3,8 +3,9 @@ class CreatePhotoTags < ActiveRecord::Migration
     create_table :photo_tags do |t|
       t.integer :poster_id
       t.integer :tagged_user_id
-      t.integer :photo_id
-      t.integer :x
+      t.integer :taggable_id
+			t.string	:taggable_type
+			t.integer :x
       t.integer :y
       t.integer :width
       t.integer :height

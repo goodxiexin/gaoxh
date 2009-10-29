@@ -1,0 +1,16 @@
+<div>
+<% video_items.each do |b| %>
+<div>
+	<% video = b.originator %>
+	<%= avatar video.poster %>
+	<%= ftime video.created_at %>
+	<%= video_link video %>
+</div>
+<% end %>
+</div>
+
+<% if @remote %>
+	<%= will_paginate video_items, :renderer => :RemoteLinkRenderer, :remote => @remote %>
+<% else %>
+	<%= will_paginate video_items %>
+<% end %>

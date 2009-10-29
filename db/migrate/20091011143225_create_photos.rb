@@ -7,6 +7,7 @@ class CreatePhotos < ActiveRecord::Migration
       t.integer :comments_count, :default => 0
       t.integer :album_id
       t.integer :user_id
+			t.integer :game_id
       t.integer :position
       t.text :notation
 

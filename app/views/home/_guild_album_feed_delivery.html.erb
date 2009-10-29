@@ -1,0 +1,10 @@
+<% delivery = guild_album_feed_delivery %>
+<% album = delivery.feed_item.originator %>
+<% guild = album.guild %>
+<% photos = Photo.find(delivery.feed_item.data[:ids]) %>
+<div id='feed_delivery_<%= delivery.id %>'>
+	<div><%= avatar album.poster %></div>
+	<div><%= profile_link album.poster %>上传了<%= photos.count %>张照片到工会<%= guild_link guild %></div>
+	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>	
+	<div><%= ftime delivery.created_at %></div>
+</div>

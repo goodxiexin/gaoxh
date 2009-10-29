@@ -7,11 +7,15 @@ class Guild::MembershipsController < ApplicationController
   before_filter :owner_required, :only => [:edit, :update, :destroy]
 
   def index
-    if params[:type].to_i == 0
+		if params[:type].to_i == 0
+			@members = @guild.veterans.paginate :page => params[:page], :per_page => 10
+    elsif params[:type].to_i == 1
       @members = @guild.members.paginate :page => params[:page], :per_page => 10
-    else
-      @members = @guild.veterans.paginate :page => params[:page], :per_page => 10
-    end
+    elsif params[:type].to_i == 2
+      @members = @guild.invitees.paginate :page => params[:page], :per_page => 10
+    elsif params[:type].to_i == 3
+			@members = @guild.requestors.paginate :page => params[:page], :per_page => 10
+		end
   end
 
   def edit
@@ -42,15 +46,25 @@ class Guild::MembershipsController < ApplicationController
   end
 
   def search
-    if params[:type].to_i == 0
-      @members = @guild.normal_memberships
+		if params[:type].to_i == 0
+      @members = @guild.veterans
+    elsif params[:type].to_i == 1
+      @members = @guild.member
+    elsif params[:type].to_i == 2
+      @members = @guild.invitees
+    elsif params[:type].to_i == 3
+      @members = @guild.requestors
+    end 
+		@members = @members.find_all {|m| m.login.include?(params[:key]) }.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
+    @remote = {:update => 'members', :url => search_guild_memberships_url(@guild, :type => params[:type], :key => params[:key])}
+    if params[:type].to_i == 2
+			render :partial => 'invitees', :object => @members
+    elsif params[:type].to_i == 3
+			render :partial => 'requestors', :object => @members
     else
-      @members = @guild.veteranships
+			render :partial => 'members', :object => @members
     end
-    @members = @members.find_all {|m| m.login.include?(params[:key]) }.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
-    @remote = {:update => 'members', :url => {:action => 'search', :type => params[:type], :key => params[:key]}}
-    render :partial => 'member_items', :object => @members
-  end
+	end
  
 protected
 

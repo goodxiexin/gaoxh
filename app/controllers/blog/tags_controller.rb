@@ -1,2 +1,5 @@
-class Blog::TagsController < ApplicationController
+class Blog::TagsController < FriendTagsController
+
+
+
 end

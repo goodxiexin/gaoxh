@@ -2,9 +2,9 @@ module Event::EventsHelper
 
   def msg status
     case
-      when status == 2 then info = '肯定去'
-      when status == 3 then info = '可能去'
-      when status == 4 then info = '去他娘的'
+      when status == 3 then info = '肯定去'
+      when status == 4 then info = '可能去'
+      when status == 5 then info = '去他娘的'
     end
     info
   end

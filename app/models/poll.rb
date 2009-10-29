@@ -8,15 +8,21 @@ class Poll < ActiveRecord::Base
 
   has_many :votes
 
-  has_many :subscribers, :through => :votes, :uniq => true
+  has_many :voters, :through => :votes
 
-  has_many :comments, :as => 'commentable', :dependent => :destroy 
+	has_many :invitations, :class_name => 'PollInvitation', :dependent => :destroy, :order => 'created_at DESC'
+
+	acts_as_commentable :order => 'created_at ASC'
+
+	acts_as_global_resources :conditions => "end_date > '#{Time.now.to_date.to_s(:db)}'", :hot_order => 'voters_count DESC' 
+
+	has_many :feed_items, :as => 'originator', :dependent => :destroy
 
   validate do |poll|
     poll.errors.add_to_base("名字不能为空") if poll.name.blank?
     poll.errors.add_to_base("名字不能超过100个字符") if poll.name.length > 100
-    poll.errors.add_to_base("描述不能超过5000个字符") if poll.description.length > 5000
-    poll.errors.add_to_base("结束时间要比今天晚阿") if poll.end_date <= Time.now.to_date 
+    poll.errors.add_to_base("描述不能超过5000个字符") if poll.description and poll.description.length > 5000
+    poll.errors.add_to_base("结束时间要比今天晚阿") if poll.end_date and poll.end_date <= Time.now.to_date 
     poll.errors.add_to_base("游戏类别不能为空") if poll.game_id.blank?
   end
 
@@ -24,21 +30,8 @@ class Poll < ActiveRecord::Base
     end_date < Time.now.to_date
   end
 
-  def votes_by user
-    votes.find(:all, :conditions => {:subscriber_id => user.id})
-  end
-
-  named_scope :hot, lambda { |game_id|
-    game_cond = game_id.blank? ? {} : {:conditions => ["game_id = ?", game_id]}
-    {:order => "subscribers_count DESC"}.merge game_cond
-  }
-
-  named_scope :recent, lambda { |game_id|
-    game_cond = game_id.blank? ? {} : {:conditions => ["game_id = ?", game_id]}
-    {:order => "created_at DESC"}.merge game_cond
-  }
-
-
-
+	def votable? user
+		user == poster || privilege == 1 || (privilege == 2 and poster.has_friend? user)
+	end
 
 end

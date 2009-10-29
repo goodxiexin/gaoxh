@@ -1,3 +1,6 @@
-<%= label_tag '性别' %> <%=  @user.gender %><br/>
-<%= label_tag '国家' %> <%= @user.country%><br/>
-<%= label_tag '城市' %> <%= @user.city %><br/>
+  <%= label_tag 'login', 'virtual name '%><%= @user.login %><br/>
+  <%= label_tag 'gender', 'gender '%><%= @profile.gender %><br/>
+  <%= label_tag 'birthday', 'birthday '%><%= ftime2 @profile.birthday %><br/>
+  <%= label_tag 'country', 'country '%><%= @profile.country %><br/>
+  <%= label_tag 'city', 'province & city'%><%= "#{@profile.province}-#{@profile.city}" %></br>
+

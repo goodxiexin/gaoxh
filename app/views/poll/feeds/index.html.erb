@@ -1,0 +1,12 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %><br/>
+<% end %>
+
+<%= render :partial => 'poll/menu' %>
+
+<div id='polls'>
+  <%= render :partial => 'poll/polls/poll_item', :collection => @feed_items.map(&:originator) %>
+</div>
+
+<%= will_paginate @feed_items %>
+

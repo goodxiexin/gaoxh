@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091017152300) do
+ActiveRecord::Schema.define(:version => 20091028102747) do
 
   create_table "albums", :force => true do |t|
     t.string   "type"
@@ -28,6 +28,18 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
 
   create_table "application_settings", :force => true do |t|
     t.integer "user_id"
+    t.boolean "emit_blog_feed",  :default => true
+    t.boolean "recv_blog_feed",  :default => true
+    t.boolean "emit_video_feed", :default => true
+    t.boolean "recv_video_feed", :default => true
+    t.boolean "emit_photo_feed", :default => true
+    t.boolean "recv_photo_feed", :default => true
+    t.boolean "emit_poll_feed",  :default => true
+    t.boolean "recv_poll_feed",  :default => true
+    t.boolean "emit_event_feed", :default => true
+    t.boolean "recv_event_feed", :default => true
+    t.boolean "emit_guild_feed", :default => true
+    t.boolean "recv_guild_feed", :default => true
   end
 
   create_table "blogs", :force => true do |t|
@@ -44,6 +56,11 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "cities", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "comments", :force => true do |t|
     t.integer  "poster_id"
     t.integer  "recipient_id"
@@ -55,14 +72,9 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
-  create_table "conversations", :force => true do |t|
-    t.integer  "initiator_id"
-    t.integer  "recipient_id"
-    t.integer  "mails_count",    :default => 0
-    t.string   "last_sent_mail"
-    t.string   "last_recv_mail"
-    t.datetime "last_sent_at"
-    t.datetime "last_recv_at"
+  create_table "countries", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "digs", :force => true do |t|
@@ -103,12 +115,28 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "feed_deliveries", :force => true do |t|
+    t.integer  "recipient_id"
+    t.integer  "feed_item_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "feed_items", :force => true do |t|
+    t.text     "data"
+    t.string   "originator_type"
+    t.integer  "originator_id"
+    t.datetime "expired_at"
+    t.datetime "created_at"
+  end
+
   create_table "forums", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.integer  "topics_count", :default => 0
-    t.integer  "posts_count",  :default => 0
+    t.integer  "topics_count",  :default => 0
+    t.integer  "posts_count",   :default => 0
     t.integer  "guild_id"
+    t.integer  "last_topic_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -126,6 +154,7 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.integer  "friend_id"
     t.integer  "user_id"
     t.integer  "status"
+    t.string   "data"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -200,65 +229,65 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.string   "name"
     t.integer  "game_id"
     t.string   "description"
-    t.integer  "members_count",  :default => 0
-    t.integer  "comments_count", :default => 0
+    t.integer  "all_count",        :default => 0
+    t.integer  "members_count",    :default => 0
+    t.integer  "veterans_count",   :default => 0
+    t.integer  "presidents_count", :default => 0
+    t.integer  "invitees_count",   :default => 0
+    t.integer  "requestors_count", :default => 0
+    t.integer  "comments_count",   :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "mail_settings", :force => true do |t|
     t.integer "user_id"
-    t.boolean "mail_me",                        :default => true
-    t.boolean "request_to_be_friend",           :default => true
-    t.boolean "confirm_friend",                 :default => true
-    t.boolean "birthday",                       :default => false
-    t.boolean "comment_my_status",              :default => true
-    t.boolean "comment_same_status_after_me",   :default => true
-    t.boolean "message_me",                     :default => true
-    t.boolean "poke_me",                        :default => true
-    t.boolean "tag_me_in_photo",                :default => true
-    t.boolean "tag_my_photo",                   :default => true
-    t.boolean "comment_my_photo",               :default => true
-    t.boolean "comment_photo_contains_me",      :default => true
-    t.boolean "comment_same_photo_after_me",    :default => true
-    t.boolean "tag_me_in_blog",                 :default => true
-    t.boolean "comment_my_blog",                :default => true
-    t.boolean "comment_same_blog_after_me",     :default => true
-    t.boolean "comment_blog_contains_me",       :default => true
-    t.boolean "tag_me_in_video",                :default => true
-    t.boolean "comment_my_video",               :default => true
-    t.boolean "comment_same_video_after_me",    :default => true
-    t.boolean "comment_video_contains_me",      :default => true
-    t.boolean "invite_me_to_event",             :default => true
-    t.boolean "change_time_of_event",           :default => true
-    t.boolean "change_place_of_event",          :default => true
-    t.boolean "cancel_event",                   :default => true
-    t.boolean "request_to_attend_my_event",     :default => true
-    t.boolean "message_me_on_event_wall",       :default => true
-    t.boolean "leave_message_on_my_event_wall", :default => true
-    t.boolean "invite_me_to_guild",             :default => true
-    t.boolean "promotion_to_president",         :default => true
-    t.boolean "promotion_to_veteran",           :default => true
-    t.boolean "request_to_attend_my_guild",     :default => true
-    t.boolean "reply_my_post",                  :default => true
-    t.boolean "message_me_on_guild_wall",       :default => true
-    t.boolean "change_name_of_guild",           :default => true
-    t.boolean "invite_me_to_poll",              :default => true
-    t.boolean "poll_expire",                    :default => true
-    t.boolean "comment_my_poll",                :default => true
-    t.boolean "comment_same_poll_after_me",     :default => true
-    t.boolean "poll_summary_change",            :default => true
+    t.boolean "mail_me",                       :default => true
+    t.boolean "request_to_be_friend",          :default => true
+    t.boolean "confirm_friend",                :default => true
+    t.boolean "birthday",                      :default => false
+    t.boolean "comment_my_status",             :default => true
+    t.boolean "comment_same_status_after_me",  :default => true
+    t.boolean "comment_my_profile",            :default => true
+    t.boolean "comment_same_profile_after_me", :default => true
+    t.boolean "poke_me",                       :default => true
+    t.boolean "tag_me_in_photo",               :default => true
+    t.boolean "tag_my_photo",                  :default => true
+    t.boolean "comment_my_album",              :default => true
+    t.boolean "comment_same_album_after_me",   :default => true
+    t.boolean "comment_my_photo",              :default => true
+    t.boolean "comment_photo_contains_me",     :default => true
+    t.boolean "comment_same_photo_after_me",   :default => true
+    t.boolean "tag_me_in_blog",                :default => true
+    t.boolean "comment_my_blog",               :default => true
+    t.boolean "comment_same_blog_after_me",    :default => true
+    t.boolean "comment_blog_contains_me",      :default => true
+    t.boolean "tag_me_in_video",               :default => true
+    t.boolean "comment_my_video",              :default => true
+    t.boolean "comment_same_video_after_me",   :default => true
+    t.boolean "comment_video_contains_me",     :default => true
+    t.boolean "invite_me_to_event",            :default => true
+    t.boolean "change_time_of_event",          :default => true
+    t.boolean "change_place_of_event",         :default => true
+    t.boolean "cancel_event",                  :default => true
+    t.boolean "request_to_attend_my_event",    :default => true
+    t.boolean "comment_my_event",              :default => true
+    t.boolean "comment_same_event_after_me",   :default => true
+    t.boolean "change_name_of_guild",          :default => true
+    t.boolean "invite_me_to_guild",            :default => true
+    t.boolean "promotion_to_president",        :default => true
+    t.boolean "promotion_to_veteran",          :default => true
+    t.boolean "request_to_attend_my_guild",    :default => true
+    t.boolean "reply_my_post",                 :default => true
+    t.boolean "comment_same_guild_after_me",   :default => true
+    t.boolean "invite_me_to_poll",             :default => true
+    t.boolean "poll_expire",                   :default => true
+    t.boolean "comment_my_poll",               :default => true
+    t.boolean "comment_same_poll_after_me",    :default => true
+    t.boolean "poll_summary_change",           :default => true
   end
 
-  create_table "memberships", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "guild_id"
-    t.integer  "status"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "messages", :force => true do |t|
+  create_table "mails", :force => true do |t|
     t.integer  "sender_id"
     t.integer  "recipient_id"
     t.boolean  "delete_by_sender",    :default => false
@@ -266,7 +295,33 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.boolean  "read_by_recipient",   :default => false
     t.string   "title"
     t.text     "content"
-    t.integer  "conversation_id"
+    t.integer  "parent_id",           :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "memberships", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "guild_id"
+    t.integer  "president_id"
+    t.integer  "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "moderator_forums", :force => true do |t|
+    t.integer  "forum_id"
+    t.integer  "moderator_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "notifications", :force => true do |t|
+    t.text     "data"
+    t.integer  "user_id"
+    t.string   "notifier_type"
+    t.integer  "notifier_id"
+    t.boolean  "read",          :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -282,7 +337,8 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
   create_table "photo_tags", :force => true do |t|
     t.integer  "poster_id"
     t.integer  "tagged_user_id"
-    t.integer  "photo_id"
+    t.integer  "taggable_id"
+    t.string   "taggable_type"
     t.integer  "x"
     t.integer  "y"
     t.integer  "width"
@@ -299,6 +355,7 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.integer  "comments_count", :default => 0
     t.integer  "album_id"
     t.integer  "user_id"
+    t.integer  "game_id"
     t.integer  "position"
     t.text     "notation"
     t.integer  "parent_id"
@@ -312,10 +369,30 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "poke_deliveries", :force => true do |t|
+    t.integer  "sender_id"
+    t.integer  "recipient_id"
+    t.integer  "poke_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "pokes", :force => true do |t|
+    t.string "name"
+    t.string "path"
+  end
+
   create_table "poll_answers", :force => true do |t|
     t.string   "description"
     t.integer  "poll_id"
-    t.integer  "votes",       :default => 0
+    t.integer  "votes_count", :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "poll_invitations", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "poll_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -329,10 +406,11 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.integer  "max_multiple"
     t.date     "end_date"
     t.text     "summary"
-    t.integer  "privilege",         :default => 2
-    t.integer  "comments_count",    :default => 0
-    t.integer  "subscribers_count", :default => 0
-    t.integer  "answers_count",     :default => 0
+    t.integer  "privilege",      :default => 2
+    t.integer  "comments_count", :default => 0
+    t.integer  "votes_count",    :default => 0
+    t.integer  "voters_count",   :default => 0
+    t.integer  "answers_count",  :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -378,6 +456,19 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "provinces", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "sharings", :force => true do |t|
+    t.integer  "shareable_id"
+    t.string   "shareable_type"
+    t.integer  "poster_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "statuses", :force => true do |t|
     t.integer  "user_id"
     t.text     "content"
@@ -386,13 +477,30 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "taggings", :force => true do |t|
+    t.integer  "tag_id"
+    t.integer  "taggable_id"
+    t.string   "taggable_type"
+    t.integer  "poster_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tags", :force => true do |t|
+    t.string   "name"
+    t.integer  "taggings_count", :default => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "topics", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "poster_id"
     t.string   "subject"
-    t.integer  "posts_count", :default => 0
     t.text     "content"
-    t.boolean  "top",         :default => false
+    t.integer  "posts_count",  :default => 0
+    t.boolean  "top",          :default => false
+    t.integer  "last_post_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -437,9 +545,15 @@ ActiveRecord::Schema.define(:version => 20091017152300) do
     t.datetime "updated_at"
   end
 
+  create_table "visitor_records", :force => true do |t|
+    t.integer  "visitor_id"
+    t.integer  "profile_id"
+    t.datetime "created_at"
+  end
+
   create_table "votes", :force => true do |t|
-    t.integer  "subscriber_id"
-    t.integer  "poll_answer_id"
+    t.text     "answer_ids"
+    t.integer  "voter_id"
     t.integer  "poll_id"
     t.datetime "created_at"
     t.datetime "updated_at"

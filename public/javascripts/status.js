@@ -1,18 +1,8 @@
 StatusBuilder = Class.create({
 
-  initialize: function(form, content, count, maximum){
-    this.content = content;
-    this.form = form;
-    this.words_count = count;
-    this.maximum = maximum;
-    this.words_count.innerHTML = "0/" + this.maximum;
-    this.content.observe('keyup', function(field){
-      if(this.content.value.length > this.maximum){
-        this.content.value = this.content.value.substring(0, this.maximum);
-        return false;
-      }
-      this.words_count.innerHTML = this.content.value.length + "/" + this.maximum;
-    }.bind(this));
+  initialize: function(){
+    this.content = $('status_content');
+    this.form = $('status_form');
   },
 
   validate: function(){

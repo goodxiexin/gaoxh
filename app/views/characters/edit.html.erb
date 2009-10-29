@@ -1,0 +1,20 @@
+<% form_remote_for :character, :html => {:id => 'character_info_form'} do |f| %>
+  <%= f.label 'character ID: ' %>
+  <%= f.text_field :name, :size => 10 %><br/>
+  <%= f.label 'level: ' %>
+  <%= f.text_field :level, :size => 10 %><br/>
+	<%= f.label 'game name: ' %>
+  <%= collection_select :character, :game_id, Game.all, :id, :name, {:prompt => '---'}, {:onchange => "profile_manager.game_onchange()"} %><br/>
+	<% unless @character.game.no_areas %>
+	<%= f.label 'aera: ' %>
+	<%= collection_select :character, :area_id, @character.game.areas, :id, :name, {:prompt => '---'}, {:onchange => "profile_manager.area_onchange();"} %><br/>
+	<% end %>
+	<%= f.label 'server: '%>
+	<%= collection_select :character, :server_id, @character.game.no_areas ? @character.game.servers : @character.area.servers, :id, :name, {:prompt => '---'} %><br/>
+	<%= f.label 'prof: '%>
+  <%= collection_select :character, :profession_id, @character.game.professions, :id, :name, {:prompt => '---'} %><br/>
+  <%= f.label 'race: '%>
+  <%= collection_select :character, :race_id, @character.game.races, :id, :name, {:prompt => '---'} %><br/>
+	<%= button_to_function '更新', "profile_manager.update_character_info(#{@character.id})" %>
+  <%= link_to_function '取消', "profile_manager.leave_edit_character_info(#{@character.id})" %>
+<% end %>

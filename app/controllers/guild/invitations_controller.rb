@@ -4,13 +4,9 @@ class Guild::InvitationsController < ApplicationController
 
   before_filter :login_required, :setup
 
-  before_filter :owner_required, :only => [:search, :index, :new, :create_multiple]
+  before_filter :owner_required, :only => [:new, :create_multiple]
 
-  before_filter :invitee_required, :only => [:edit, :update]
-
-  def index
-    @invitations = @guild.invitations.paginate :page => params[:page], :per_page => params[:per_page]
-  end
+  before_filter :invitee_required, :only => [:edit, :accept, :decline]
 
   def new
     @friends = @user.friends
@@ -25,27 +21,30 @@ class Guild::InvitationsController < ApplicationController
     render :action => 'edit', :layout => false
   end
 
-  def update
-    @invitation.update_attributes(params[:invitation])
+	def accept
+		@invitation.update_attribute('status', 5)
+	end
+
+	def decline
+    @invitation.destroy
   end
 
   def search
-    @friends = @user.friends.find_all {|f| f.login.include?(params[:key])}
+    @friends = current_user.friends.find_all {|f| f.login.include?(params[:key])}
     render :partial => 'friends'
   end
-
 
 protected
 
   def setup
-    if ['index', 'new', 'search'].include? params[:action]
+    if ['new'].include? params[:action]
       @guild = Guild.find(params[:guild_id])
       @user = @guild.president
     elsif ['create_multiple'].include? params[:action]
       @guild = Guild.find(params[:guild_id])
       @user = @guild.president
       @users = params[:users].blank? ? [] : @user.friends.find(params[:users])
-    elsif ['edit', 'update'].include? params[:action]
+    elsif ['edit', 'accept', 'decline'].include? params[:action]
       @guild = Guild.find(params[:guild_id])
       @user = @guild.president
       @invitation = @guild.invitations.find(params[:id])

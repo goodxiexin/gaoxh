@@ -6,7 +6,7 @@
   <%= render :partial => '/app_menu' %>
 <% end %>
 
-<%= render :partial => 'menu' %>
+<%= render :partial => 'video/menu' %>
 
 <%= error_messages_for :video, :header_message => '遇到以下问题，没法成功保存', :message => nil %>
 
@@ -29,18 +29,18 @@
   </div>
   <div class='tag'>
     添加和日志相关的好友<br/>
-    <%= auto_complete_text_field :user, :login, '/base/friend_tags/friends_auto_complete', {}, {:after_update_element => 'add_friend_tag'} %>
+    <%= auto_complete_text_field :user, :login, '/friend_tags/friends_auto_complete', {}, {:after_update_element => 'add_friend_tag'} %>
     <%= button_to_function '', :id => 'toggle_button' %>
   </div>
   <div id='friend_tags'>
-    <%= render :partial => 'base/friend_tags/tag', :collection => @video.tags %>
+    <%= render :partial => 'friend_tags/tag', :collection => @video.tags %>
   </div>
 <% end %>
 </div>
 
-<% user_ids = @video.tags.blank? ? '[]' : array_or_string_for_javascript(@video.tags.map {|t| t.friend_id}) %>
+<% user_ids = array_or_string_for_javascript(@video.tags.map {|t| t.friend_id}) %>
 <%= javascript_tag "
   var tag_builder = new FriendTagBuilder('toggle_button', 'user_login', #{user_ids});
-  var video_builder = new VideoBuilder('video_title', 'video_url', 'video_privilege', 'video_game_id', 'video_form', tag_builder);
+  var video_builder = new VideoBuilder(tag_builder);
 " %>
 

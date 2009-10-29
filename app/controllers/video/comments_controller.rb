@@ -1,4 +1,4 @@
-class Video::CommentsController < Base::CommentsController
+class Video::CommentsController < CommentsController
 
 protected 
 

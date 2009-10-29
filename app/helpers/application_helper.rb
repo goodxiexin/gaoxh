@@ -11,14 +11,14 @@ module ApplicationHelper
 
   def avatar(user, size="small")
     if user.avatar.blank?
-      link_to image_tag("default_#{size}.png"), :popup => true
+      link_to image_tag("default_#{size}.png"), profile_url(user.profile), :popup => true
     else
-      link_to image_tag(user.avatar.public_filename(size)), :popup => true
+      link_to image_tag(user.avatar.public_filename(size)), profile_url(user.profile), :popup => true
     end
   end
 
   def profile_link(user)
-    link_to user.login, :popup => true
+    link_to user.login, profile_url(user.profile), :popup => true
   end
 
   def validation_image
@@ -41,8 +41,8 @@ module ApplicationHelper
     time.strftime("%H: %M") unless time.blank?
   end
 
-  def gender_select_tag user
-    select_tag "user[gender]", options_for_select([['男', 'male'], ['女', 'female']], user.gender) 
+  def gender_select_tag obj
+    select_tag "#{obj.class.to_s.underscore}[gender]", options_for_select([['男', 'male'], ['女', 'female']], obj.gender) 
   end
   
   def privilege_select_tag(object)
@@ -94,12 +94,44 @@ module ApplicationHelper
     "(<span id='dig_#{diggable.class.to_s.underscore}_#{diggable.id}'>#{diggable.digs_count}</span>)"
   end
 
+  def blog_link blog
+    link_to (truncate blog.title, :length => 20), blog_url(blog)
+  end
+
+	def video_link video
+		link_to (truncate video.title, :length => 20), video_url(video)
+	end
+
   def game_link game
     link_to game.name
   end
 
   def event_link event
     link_to (truncate event.title, :length => 20), event_url(event)
+  end
+
+	def poll_link poll
+		link_to (truncate poll.name, :length => 20), poll_url(poll)
+	end
+
+	def guild_link guild
+		link_to (truncate guild.name, :length => 20), guild_url(guild)
+	end
+
+	def forum_link forum
+		link_to (truncate forum.name, :length => 20), forum_url(forum)
+	end
+
+	def topic_link topic
+		link_to (truncate topic.subject, :length => 20), forum_topic_url(topic.forum, topic)
+	end
+
+	def mail_link mail, type
+		link_to mail.title, mail_url(mail, :type => type)
+	end
+
+	def mail_select_tag
+    select_tag 'select', options_for_select([['---', '^_^'], ['全部选中','all'], ['选读过的', 'read'], ['选没读的', 'unread'], ['取消全选', 'none']], "---"), :onchange => "select_dropdown_onchange(this)"
   end
 
 end

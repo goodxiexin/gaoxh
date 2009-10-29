@@ -3,14 +3,14 @@
   <li id='friend_<%= f.id %>'>
     <div class='friendCard'>
       <div class='avatar'>
-        <%= avatar f.profile %>
+        <%= avatar f %>
       </div>
       <div class='option'>
         <%= facebox_confirm 'x', friend_url(f), {:msg => '你确定要解除好友关系吗?', :method => :delete} %>
       </div>
       <div class='info'>
-        <%= profile_link f.profile %><br/>
-        <%= f.profile.games.map {|g| g.name}.join(',') %>
+        <%= profile_link f %><br/>
+        <%= f.games.map {|g| g.name}.join(',') %>
       </div>
     </div>
   </li>

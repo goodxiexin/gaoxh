@@ -12,6 +12,8 @@ class GameCharacter < ActiveRecord::Base
 
   belongs_to :profession, :class_name => 'GameProfession'
 
+	has_many :feed_items, :as => 'originator', :dependent => :destroy
+
   validate do |character|
     character.errors.add_to_base('用户名不能为空') if character.name.blank?
     character.errors.add_to_base('等级不能为空') if character.level.blank?

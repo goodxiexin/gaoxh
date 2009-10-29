@@ -2,14 +2,15 @@ class Poll::VotesController < ApplicationController
 
   before_filter :login_required, :setup
 
-  before_filter :privilege_required 
+  before_filter :privilege_required, :not_voted_required
 
   def create
-    params[:votes].each do |answer_id|
-      @poll.votes.create(:poll_answer_id => answer_id, :subscriber_id => current_user.id)
-    end
-    @poll.increment!(:subscribers_count) # a hack
-    redirect_to poll_url(@poll)
+		if @poll.votes.create(:voter_id => current_user.id, :answer_ids => params[:votes])
+			redirect_to poll_url(@poll)
+		else
+			flash[:error] = "保存的时候发生错误"
+			redirect_to poll_url(@poll)
+		end
   end
 
 protected
@@ -21,5 +22,9 @@ protected
   rescue
     not_found
   end
+
+	def not_voted_required
+		!@poll.voters.include? current_user || not_found
+	end
 
 end

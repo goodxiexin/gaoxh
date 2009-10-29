@@ -65,21 +65,29 @@ EventBuilder = Class.create({
   },
 
   change_game: function(){
-    new Ajax.Request('/games/' + this.game.value, {
+    new Ajax.Request('/games/' + this.game.value + '/game_details', {
       method: 'get',
       onSuccess: function(transport){
-        var areas = transport.responseText.evalJSON(); // pass parameter true if the source is not trusted
-        var html = "";
-        for(var i=0;i<areas.length;i++)
-          html += "<option value=" + areas[i].game_area.id +">" + areas[i].game_area.name + "</option>"
-        this.area.innerHTML = html;
-        this.change_area();
+        var details = transport.responseText.evalJSON(); // pass parameter true if the source is not trusted
+				var html = "";
+				if(details.no_areas){
+					var servers = details.servers;
+					for(var i=0;i<servers.length;i++)
+						html += "<option value=" + servers[i].game_server.id + ">" + servers[i].game_server.name + "</option>";
+					this.server.innerHTML = html;
+				}else{
+					var areas = details.areas;	
+					for(var i=0;i<areas.length;i++)
+						html += "<option value=" + areas[i].game_area.id +">" + areas[i].game_area.name + "</option>";
+					this.area.innerHTML = html;
+					this.change_area();
+				}
       }.bind(this)
     }); 
   },
 
   change_area: function(){
-    new Ajax.Request('/game_areas/' + this.area.value, {
+    new Ajax.Request('/games/' + this.game.value + '/area_details?area_id=' + this.area.value, {
       method: 'get',
       onSuccess: function(transport){
         var servers = transport.responseText.evalJSON();

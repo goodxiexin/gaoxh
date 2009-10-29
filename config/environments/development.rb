@@ -1,6 +1,6 @@
 # Settings specified here will take precedence over those in config/environment.rb
 SITE_URL = "http://localhost:3000"
-SITE_EMAIL = "gaoxh04@gmail.com"
+SITE_MAIL = "gaoxh04@gmail.com"
 
 # In the development environment your application's code is reloaded on
 # every request.  This slows down response time but is perfect for development

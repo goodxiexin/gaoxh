@@ -1,54 +1,78 @@
-<%= javascript_include_tag 'profile' %>
-
 <% content_for :left do %>
+	<div>
+		<div id='avatar'>
+			<%= album_cover @user.avatar_album, :medium %>
+		</div>
+		<ul>
+			<% if @user == current_user %>
+				<li><%= link_to "修改头像", new_avatar_url(:album => 0), :rel => 'facebox' %></li>
+			<% elsif @user.has_friend? current_user %>
+				<li><%= link_to "发站内信", new_mail_url(:recipient_id => @user.id) %></li>
+				<li><%= link_to_function "给他留言", "window.scrollTo(0, $('comment_content').positionedOffset().top - 20);$('comment_content').focus();" %></li>
+				<li><%= link_to "打招呼", new_poke_url(:id => @user.id), :rel => 'facebox' %></li>
+			<% else %>
+				<li><%= link_to "发站内信", new_mail_url(:recipient_id => @user.id) %></li>
+				<li><%= link_to_function "给他留言", "window.scrollTo(0, $('comment_content').positionedOffset().top - 20);$('comment_content').focus();" %></li>
+        <li><%= link_to "打招呼", new_poke_url(:id => @user.id), :rel => 'facebox' %></li>
+				<li><%= link_to "加为好友", new_friend_request_url(:friend_id => @user.id), :rel => 'facebox' %></li>
+			<% end %>
+		</ul>
+	</div>
   <%= render :partial => 'menu' %>
 <% end %>
 
-<div class='head'>
-<% if @user == current_user %>
-  <h3>我的档案</h3>
-<% else %>  
-  <h3 class='user'>
-    <%= avatar @user %><br/>
-    <%= profile_link @user %>的档案
-  </h3>
+<% content_for :right do %>
+	<div id='tag_cloud'>
+	<% if @user == current_user %>
+		<%= render :partial => 'profile/tags/tag_cloud' %>
+	<% elsif @taggable %>
+		<%= render :partial => 'profile/tags/basic_tags' %>
+		<% form_remote_for :tag, :url => profile_tags_url(@profile) do |f| %>
+			都不贴切？自己想个<br/>
+			<%= f.text_field 'name' %>
+			<%= f.submit '提交' %>
+		<% end %>
+	<% else %>
+		<%= render :partial => 'profile/tags/tag_cloud' %>
+	<% end %>
+	</div>
+	<div>
+		<% @profile.visitor_records.each do |v| %>
+		<li>
+			<%= avatar v.visitor %>
+			<%= profile_link v.visitor %>
+			<%= distance_of_time_in_words_to_now v.created_at %> ago
+		</li>
+		<% end %>
+	</div>
 <% end %>
+
+<% if @user == current_user %>
+  <%= in_place_text_field @profile, :about_me, {:empty_text => '介绍下自己？', :url => update_about_me_profile_url(@profile), :name => 'profile[about_me]', :rows => 2, :cols => 90} %>
+<% else %>
+  <div id='about_me'><%= @profile.about_me %></div>
+<% end %>
+
+<div class='msg-header'>
+<h3>留言版</h3>
+</div>
+<div class='msg-body'>
+  <% form_remote_for :comment, :url => profile_comments_url(@profile) do |f| %>
+  <div class='composer'>
+    <%= hidden_field_tag 'comment[recipient_id]', @user.id %>
+    <%= f.text_area 'content', :rows => 5, :cols => 75 %>
+  </div>
+  <div class='emotion'>
+    <%= emotion_link 'comment_content' %>
+  </div>
+  <div class='button'>
+    <%= f.submit '提交', :class => 'confirm-button' %>
+    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
+  </div>
+  <% end %>
 </div>
 
-<div class='body'>
-  <div id='basic_info' class='section'>
-    <div class='section-header'>
-      基本信息
-      <% if @user == current_user %>
-        <%= link_to_function '(编辑)', "profile_manager.edit_basic_info()" %>
-      <% end %>
-    </div>
-    <div class='section-body'>
-    </div>
-  </div>
-  <div id='contact_info' class='section'>
-    <div class='section-header'>
-      联系信息
-      <% if @user == current_user %>
-        <%= link_to_function '(编辑)', "profile_manager.edit_contact_info()" %>
-      <% end %>
-    </div>
-    <div class='section-body'>
-    </div>
-  </div>
-  <div id='game_info' class='section'>
-    <div class='section-header'>
-      游戏信息
-      <% if @user == current_user %>
-        <%= link_to_function '(编辑)', "profile_manager.edit_game_info()" %>
-      <% end %> 
-    </div>
-    <div class='section-body'>
-      
-    </div>
-  </div>
+<div id='profile_comments'>
+  <%= render :partial => 'profile/comments/comment', :collection => @comments %>
 </div>
 
-<%= javascript_tag "
-  profile_manager = new ProfileManager(#{@user.id});
-"%>

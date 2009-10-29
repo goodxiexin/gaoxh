@@ -1,3 +1,9 @@
+<% content_for :left do %>
+	<%=render :partial => '/app_menu' %>
+<% end %>
+
+<%= render :partial => 'guild/menu' %>
+
 <%= javascript_include_tag 'guild' %>
 
 <%= error_messages_for :guild, :header_message => '以下原因导致工会创建失败', :message => nil %>
@@ -14,7 +20,7 @@
     <%= form.label '封面: ' %>
     <%= form.file_field :uploaded_data %>
   <% end %>
-  <%= button_to_function '提交',  "guild_builder.save('guild_form');"%>   
+  <%= button_to_function '提交',  "guild_builder.save();"%>   
 <% end %>
 </div>
 

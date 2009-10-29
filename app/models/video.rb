@@ -4,47 +4,26 @@ class Video < ActiveRecord::Base
 
   belongs_to :game
 
-  has_many :comments, :as => 'commentable', :dependent => :destroy
+	acts_as_commentable :order => 'created_at ASC'
 
-  has_many :tags, :as => 'taggable', :class_name => 'FriendTag', :dependent => :destroy
+	acts_as_friend_taggable :class_name => 'FriendTag'
 
-  has_many :digs, :as => 'diggable', :dependent => :destroy
+	acts_as_diggable
 
-  before_create :generate_link
+  acts_as_list :order => 'created_at', :scope => 'poster_id'
+ 
+	acts_as_global_resources
 
-  acts_as_list :order => 'created_at DESC', :scope => 'poster_id'
-  
+	has_many :feed_items, :dependent => :destroy, :as => 'originator'
+ 
   validate do |video|
     video.errors.add_to_base('标题不能为空') if video.title.blank?
     video.errors.add_to_base('url不能为空') if video.url.blank?
     video.errors.add_to_base('游戏类别不能为空') if video.game_id.blank?
-    video.errors.add_to_base('标题太长，最长100个字符') if video.title.length >= 100
+    video.errors.add_to_base('标题太长，最长100个字符') if video.title and video.title.length >= 100
   end
 
-  named_scope :viewable, lambda { |relationship, game_id|
-    case relationship
-    when 'owner'
-      cond = game_id.blank? ? {} : {:conditions => ["game_id = ?", game_id]}
-    when 'friend'
-      cond = game_id.blank? ? {:conditions => ["privilege = 1 or privilege = 2 or privilege = 3"]} : {:conditions => ["(privilege = 1 or privilege = 2 or privilege = 3) and game_id = #{game_id}"]}
-    when 'same_game'
-      cond = game_id.blank? ? {:conditions => ["privilege = 1 or privilege = 2"]} : {:conditions => ["(privilege = 1 or privilege = 2) and game_id = #{game_id}"]}
-    when 'stranger'
-      cond = game_id.blank? ? {:conditions => ["privilege = 1"]} : {:conditions => ["privilege = 1 and game_id = #{game_id}"]}
-    end
-    {:order => 'created_at DESC'}.merge cond
-  }
-
-  named_scope :hot, lambda { |game_id|
-    game_cond = game_id.blank? ? {} : {:conditions => ["game_id = ?", game_id]}
-    {:order => "digs_count DESC"}.merge game_cond
-  }
-
-  named_scope :recent, lambda { |game_id|
-    game_cond = game_id.blank? ? {} : {:conditions => ["game_id = ?", game_id]}
-    {:order => "created_at DESC"}.merge game_cond
-  }
-
+	before_create :generate_link
 
   class VideoURLNotValid < StandardError; end
 

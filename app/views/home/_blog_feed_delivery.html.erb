@@ -1,0 +1,11 @@
+<% delivery = blog_feed_delivery %>
+<% blog = delivery.feed_item.originator %>
+<div id='feed_delivery_<%= delivery.id %>'>
+	<div><%= avatar blog.poster %></div>
+	<div>
+		<%= profile_link blog.poster %>撰写了日志<%= blog_link blog %>
+	</div>
+	<div><%= truncate blog.content, 80 %></div>
+	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
+	<div><%= ftime delivery.created_at %></div>
+</div>

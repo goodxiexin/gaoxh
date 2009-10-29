@@ -6,7 +6,7 @@ class Video::VideosController < ApplicationController
 
   before_filter :owner_required, :only => [:edit, :update, :destroy]
 
-  before_filter :friend_or_owner_required, :only => [:index]
+  before_filter :friend_or_owner_required, :only => [:index, :relative]
 
   before_filter :privilege_required, :only => [:show]
 
@@ -19,7 +19,7 @@ class Video::VideosController < ApplicationController
   end
 
   def create
-    if @video = @user.videos.create(params[:video].merge({:poster_id => current_user.id}))
+    if @video = Video.create(params[:video].merge({:poster_id => current_user.id}))
       redirect_to video_url(@video)
     else
       render :action => 'new'
@@ -49,10 +49,15 @@ class Video::VideosController < ApplicationController
   end
 
   def destroy
-    @video.destroy
-    render :update do |page|
-      page.redirect_to videos_url(:id => @user.id)
-    end
+		if @video.destroy
+			render :update do |page|
+				page.redirect_to videos_url(:id => @user.id)
+			end
+		else
+			render :update do |page|
+				page << "error('删除的时候发生错误');"
+			end
+		end
   end
 
   def hot
@@ -63,10 +68,14 @@ class Video::VideosController < ApplicationController
     @videos = Video.recent(params[:game_id]).paginate :page => params[:page], :per_page => 10
   end
 
+	def relative
+		@videos = Video.relative_to(@user.id, params[:game_id]).paginate :page => params[:page], :per_page => 10
+	end
+
 protected
 
   def setup
-    if ['index', 'hot', 'recent'].include? params[:action]
+    if ['index', 'hot', 'recent', 'relative'].include? params[:action]
       @user = User.find(params[:id])
     elsif ['new', 'create'].include? params[:action]
       @user = current_user

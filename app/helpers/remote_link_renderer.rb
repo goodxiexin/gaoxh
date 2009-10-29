@@ -13,7 +13,15 @@ class RemoteLinkRenderer < WillPaginate::LinkRenderer
 
   def page_link_or_span(page, span_class = 'current', text = nil)
     text ||= page.to_s
-    url_options = @url.merge({:page => page})
+		if @url.instance_of? Hash
+			url_options = @url.merge({:page => page})
+		else
+			if @url.include? '?'
+				url_options = @url + "&page=#{page}"
+			else
+				url_options = @url + "?page=#{page}"
+			end
+		end
     if page and page != current_page
       @template.link_to_remote(text, {:url => url_options, :method => :get}.merge(@remote))
     else

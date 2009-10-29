@@ -6,8 +6,13 @@ class CreateGuilds < ActiveRecord::Migration
       t.string :description
 
       # counters
-      t.integer :members_count, :default => 0
-      t.integer :comments_count, :default => 0
+			t.integer :all_count, :default => 0
+			t.integer :members_count, :default => 0
+			t.integer :veterans_count, :default => 0
+			t.integer :presidents_count, :default => 0
+			t.integer :invitees_count, :default => 0
+			t.integer :requestors_count, :default => 0 
+			t.integer :comments_count, :default => 0
 
       t.timestamps
     end

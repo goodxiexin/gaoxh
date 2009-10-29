@@ -5,7 +5,7 @@
     <%= label_tag '', '游戏:' %><span class='fby-tiny'><%= @guild.game.name %></span><br/>
     <%= label_tag '', '会长:' %>
     <span class='fby-tiny'>
-      <%= link_to_user @guild.president %>
+      <%= profile_link @guild.president %>
     </span>
   </div>
 </div>

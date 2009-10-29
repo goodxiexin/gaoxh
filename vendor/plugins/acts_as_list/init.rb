@@ -1,2 +1,1 @@
-# Include hook code here
-require 'acts_as_list'
+require File.dirname(__FILE__) + '/lib/acts_as_list'

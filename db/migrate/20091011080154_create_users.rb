@@ -12,7 +12,7 @@ class CreateUsers < ActiveRecord::Migration
       t.datetime	:activated_at
       t.string	:password_reset_code
       t.boolean	:enabled,	:default => false
-      t.integer :avatar_id
+			t.integer :avatar_id
 
       # counters
       t.integer :albums_count, :default => 0

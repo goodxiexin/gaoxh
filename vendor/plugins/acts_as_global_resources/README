@@ -1,0 +1,17 @@
+ActsAsGlobalResources
+=====================
+
+添加3个方法：
+viewable：对某个用户可见的
+
+hot: 最火的
+
+recent： 最近的
+
+Example
+=======
+
+Example goes here.
+
+
+Copyright (c) 2009 [name of plugin creator], released under the MIT license

@@ -1,0 +1,23 @@
+<% content_for :left do %>
+	<%= render :partial => '/app_menu' %>
+<% end %>
+
+<%= javascript_include_tag 'mailbox.js' %>
+
+<%= render :partial => 'menu' %><br/>
+
+<div class='mailbox-operation'>
+  <%= "select: " %>
+  <%= mail_select_tag %>
+  <%= link_to_function '标记已读',   "read_mails(#{current_user.id}, 1)", :id => 'read_mails_link' %> |
+  <%= link_to_function '标记未读', "unread_mails(#{current_user.id}, 1)", :id => 'unread_mails_link' %> |
+  <%= link_to_function '删除', "delete_mails(#{current_user.id}, 1)", :id => 'delete_mails_link' %>
+</div>
+
+<div id='recv_mails_count'>
+</div>
+
+<div id='mails'>
+  <%= render :partial => 'recv_mails', :object => @mails %>
+  <div class='mail-pagination'><%= will_paginate @mails %> 
+</div>

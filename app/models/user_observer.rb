@@ -1,6 +1,6 @@
 class UserObserver < ActiveRecord::Observer
   def after_create(user)
-    user.create_profile
+    user.create_profile(:gender => user.gender)
     user.create_privacy_setting
     user.create_mail_setting
     user.create_application_setting

@@ -5,8 +5,8 @@
       <% if @event.participantable? current_user %>
         <span class='subtitle'>你还没加入这个活动，是否加入</span>
         <% form_remote_for :request, :url => event_requests_url(@event, :show => 1) do |f| %>
-          <%= f.radio_button 'content', 1 %><%= label_tag '', '肯定参加' %><br/>
-          <%= f.radio_button 'content', 2 %><%= label_tag '', '可能参加' %><br/>
+          <%= f.radio_button 'status', 1 %><%= label_tag '', '肯定参加' %><br/>
+          <%= f.radio_button 'status', 2 %><%= label_tag '', '可能参加' %><br/>
           <%= f.submit '请求加入', :style => "margin-left:120px;" %>
         <% end %>
       <% else %>
@@ -15,10 +15,10 @@
       <% end %>
     <% elsif @participation.status == 0 %>
       <span class='subtitle'>你被邀请加入这个活动，赶紧回复</span><br/>
-      <%= f.radio_button :status, 3, :onclick => "new Ajax.Request('#{accept_event_invitation_url(@event, @invitation, 'participation[status]' => 1, :show => 1)}', {method: 'delete'});" %><%= label_tag '', '肯定去' %><br/>
-      <%= f.radio_button :status, 4, :onclick => "new Ajax.Request('#{accept_event_invitation_url(@event, @invitation, 'participation[status]' => 2, :show => 1)}', {method: 'delete'});" %><%= label_tag '', '可能去' %><br/>
-      <%= f.radio_button :status, 5, :onclick => "if(confirm('are you sure?')){new Ajax.Request('#{decline_event_invitation_url(@event, @invitation, :show => 1)}', {method: 'delete'});}" %><%= label_tag '', '不鸟他' %><br/> 
-    <% elsif @participation.status == 1 or @participation.status == 2 %>
+			 <%= radio_button :invitation, :status, 1, :onclick => "new Ajax.Request('#{event_invitation_url(@event, @participation, 'invitation[status]' => 3, :show => 1, :authenticity_token => form_authenticity_token)}', {method: 'put'});" %><%= label_tag '', '肯定去' %><br/>
+			<%= radio_button :invitation, :status, 2, :onclick => "new Ajax.Request('#{event_invitation_url(@event, @participation, 'invitation[status]' => 4, :show => 1, :authenticity_token => form_authenticity_token)}', {method: 'put'});" %><%= label_tag '', '可能去' %><br/>
+			<%= radio_button :invitation, :status, 3, :onclick => "if(confirm('are you sure?')){new Ajax.Request('#{event_invitation_url(@event, @participation, 'invitation[status]' => 5, :show => 1, :authenticity_token => form_authenticity_token)}', {method: 'put'});}" %><%= label_tag '', '不鸟他' %><br/>
+		<% elsif @participation.status == 1 or @participation.status == 2 %>
       <span class='subtitle'>你已经请求加入这个活动了, 清耐心等待回复，或者你可以给他<%= link_to '发信' %></span>
     <% else %>
       <span class='subtitle'>你可以修改你的状态</span>

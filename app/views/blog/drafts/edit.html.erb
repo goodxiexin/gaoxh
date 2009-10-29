@@ -38,9 +38,9 @@
 <% end %>
 </div>
 
-<% user_ids = @blog.tags.blank? ? '[]' : @blog.tags.map {|t| t.friend_id}.join(',') %>
+<% user_ids = array_or_string_for_javascript @blog.tags.map {|t| t.friend_id} %>
 <%= javascript_tag "
   var tag_builder = new FriendTagBuilder('toggle_button', 'user_login', #{user_ids}); 
-  var blog_builder = new BlogBuilder('blog_content', 'blog_title', 'blog_privilege', 'blog_game_id', 'blog_form', tag_builder);
+  var blog_builder = new BlogBuilder(tag_builder);
 " %>
 

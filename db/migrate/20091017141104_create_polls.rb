@@ -11,7 +11,8 @@ class CreatePolls < ActiveRecord::Migration
       t.text :summary
       t.integer :privilege, :default => 2 # 1. all 2. only friends
       t.integer :comments_count, :default => 0
-      t.integer :subscribers_count, :default => 0
+			t.integer :votes_count, :default => 0
+      t.integer :voters_count, :default => 0
       t.integer :answers_count, :default => 0
       t.timestamps
     end

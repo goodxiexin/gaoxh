@@ -2,9 +2,9 @@
   <span class='title'><%= blog_link blog_item %></span>
   <span class='option'>
     <%= ftime blog_item.created_at %>
-    <% if @user == current_user %>
-    <%= link_to "编辑", edit_blog_url(blog_item) %>
-    <%= facebox_confirm 'x', blog_url(blog_item), {:msg => "你确定要删除这篇博客吗?", :method => :delete} %>
+    <% if blog_item.poster == current_user %>
+	    <%= link_to "编辑", edit_blog_url(blog_item) %>
+	    <%= facebox_confirm 'x', blog_url(blog_item), {:msg => "你确定要删除这篇博客吗?", :method => :delete} %>
     <% end %>
   </span>
 </dd> 

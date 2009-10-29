@@ -1,77 +1,39 @@
 class ParticipationObserver < ActiveRecord::Observer
 
-  def user_link(user)
-    user.login
-  end
+	def after_create(participation)
+		event = participation.event
+		participant = participation.participant
+		if participation.status == 0
+			# invitation created
+			EventMailer.deliver_invitation event, participant if participant.mail_setting.invite_me_to_event
+		elsif participation.status == 1 or participation.status == 2
+			# request created
+			EventMailer.deliver_request event, participant if participant.mail_setting.request_to_attend_my_event
+		end	
+	end
 
-  def event_link(event)
-    "<a href='http://localhost:3000/users/#{event.poster_id}/#{event.id}'>#{event.title}</a>"
-  end
+	def after_update(participation)
+		event = participation.event
+		participant = participation.participant
+		if participation.status_was == 0 and [3,4,5].include? participation.status
+			# invitation accepted
+			event.poster.notifications.create(:data => "#{profile_link participant}接受了你的邀请，加入活动#{event_link event}")
+		elsif [1,2].include? participation.status_was and [3,4,5].include? participation.status
+			# request accepted
+			participant.notifications.create(:data => "#{profile_link event.poster}同意了你加入活动#{event_link event}的请求")
+		elsif [3,4,5].include? participation.status_was and [3,4,5].include? participation.status
+			# participant changes status
+			# TODO: 是否有必要让poster知道
+		end		
+	end
 
-  def counter_field status
-    case status
-    when 0
-      "invitees_count"
-    when 1
-      "requestors_count"
-    when 2
-      "requestors_count"
-    when 3
-      "confirmed_count"
-    when 4
-      "maybe_count"
-    when 5
-      "declined_count"
-    end
-  end
-
-  def increment_counter event, status
-    sql = "update events set #{counter_field status} = #{counter_field status} + 1 where id = #{event.id}"
-    ActiveRecord::Base.connection.execute(sql)
-  end
-
-  def decrement_counter event, status
-    sql = "update events set #{counter_field status} = #{counter_field status} - 1 where id = #{event.id}"
-    ActiveRecord::Base.connection.execute(sql)
-  end
-
-  def after_create(participation)
-    event = participation.event
-    participant = participation.participant
-    poster = event.poster
-
-    if participation.status == 0
-    elsif participation.status == 1 or participation.status == 2
-    else
-    end
-  
-    increment_counter event, participation.status
-  end
-
-  def after_update(participation)
-    event = participation.event
-    participant = participation.participant
-    poster = event.poster
-
-    if participation.status_was == 0
-    elsif participation.status_was == 1 or participation.status_was == 2
-    else
-    end
-
-    decrement_counter event, participation.status_was
-    increment_counter event, participation.status
-  end
-
-  def after_destroy(participation)
-    event = participation.event
-    participant = participation.participant
-    poster = event.poster
-
-    # request was declined
-    if participation.status_was == 1 or participation.status_was == 2
-    end
-
-    decrement_counter event, participation.status_was
-  end
+	def after_destroy(participation)
+		event = participation.event
+		participant = participation.participant
+		if [1,2].include? participation.status_was
+			# request declined
+			participant.notifications.create(:data => "#{profile_link event.poster}拒绝了你加入活动#{event_link event}的请求")
+		end
+	end
 
 end

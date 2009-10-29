@@ -1,0 +1,18 @@
+<%= javascript_include_tag 'mailbox.js' %>
+
+<% content_for :left do %>
+	<%= render :partial => '/app_menu' %>
+<% end %>
+
+<%= render :partial => 'menu' %><br/>
+
+<div class='mailbox-operation'>
+  <%= "select: " %>
+  <%= mail_select_tag %>
+  <%= link_to_function '删除', "delete_mails(#{current_user.id}, 0)", :id => 'delete_mails_link' %>
+</div>
+
+<div id='mails'>
+  <%= render :partial => 'sent_mails', :object => @mails %>
+  <%= will_paginate @mails %>
+</div>

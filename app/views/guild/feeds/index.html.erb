@@ -1,0 +1,12 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %><br/>
+<% end %>
+
+<%= render :partial => 'guild/menu' %>
+
+<div id='guilds'>
+  <%= render :partial => 'membership_item', :collection => @feed_items %>
+</div>
+
+<%= will_paginate @feed_items %>
+

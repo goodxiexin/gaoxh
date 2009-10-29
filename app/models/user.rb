@@ -1,33 +1,59 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-
+	
   has_one :profile, :dependent => :destroy
 
+	# mails
+	has_many :out_mails, :class_name => 'Mail', :foreign_key => 'sender_id', :conditions => { :delete_by_sender => false }, :order => 'created_at DESC'
+
+  has_many :in_mails, :class_name => 'Mail', :foreign_key => 'recipient_id', 
+					 :conditions => { :delete_by_recipient => false }, :order => 'created_at DESC'  
+
+  def sent_mails
+    mails = self.out_mails.group_by { |mail| mail.parent_id }
+    mails.map do |parent_id, mail_array|
+      mail_array.max {|a,b| a.created_at <=> b.created_at}
+    end.sort {|a,b| b.created_at <=> a.created_at}
+  end
+
+  def recv_mails
+    mails = self.in_mails.group_by { |mail| mail.parent_id }
+    mails.map do |parent_id, mail_array|
+      mail_array.max {|a,b| a.created_at <=> b.created_at}
+    end.sort {|a,b| b.created_at <=> a.created_at }
+  end
+
+	# notifications
+	has_many :notifications
+
+	# pokes
+	has_many :poke_deliveries, :foreign_key => 'recipient_id', :order => 'created_at DESC'
+
+	# status
   has_many :statuses, :order => 'created_at DESC', :dependent => :destroy
 
+	has_one :latest_status, :class_name => 'Status', :order => 'created_at DESC'
+
   # friend
-  has_many :friendships, :dependent => :destroy
+	has_many :all_friendships, :class_name => 'Friendship'
 
-  has_many :pending_friendships, :class_name => 'Friendship', :conditions => {:status => 0}, :dependent => :destroy
+  has_many :friendships, :dependent => :destroy, :conditions => {:status => 1}
 
-  has_many :accepted_friendships, :class_name => 'Friendship', :conditions => {:status => 1}, :dependent => :destroy
-
-  has_many :intimate_friendships, :class_name => 'Friendship', :conditions => {:status => 2}, :dependent => :destroy
-
-  has_many :pending_friends, :class_name => 'User', :through => :pending_friendships, :source => 'friend'
-
-  has_many :friends, :class_name => 'User', :through => :accepted_friendships, :source => 'friend'
-
-  has_many :intimate_friends, :class_name => 'User', :through => :intimate_friendships, :source => 'friend'
+	has_many :friends, :through => :friendships, :source => 'friend', :order => 'login ASC'
 
   def has_friend? user
-    accepted_friendships.find_by_friend_id user.id
+		all_friendships.find(:first, :conditions => {:friend_id => user.id, :status => 1})
   end
 
   def wait_for? user
-    pending_friendships.find_by_friend_id user.id
+		all_friendships.find(:first, :conditions => {:friend_id => user.id, :status => 0})
   end
+
+	def common_friends_with user, num
+		common_friendships = friendships.map(&:friend_id) & user.friendships.map(&:friend_id)
+		common_friendships[0..(num-1)].map { |friend_id| User.find(friend_id)}
+	end
 
   # profile
   has_one :profile, :dependent => :destroy
@@ -43,6 +69,13 @@ class User < ActiveRecord::Base
   has_many :characters, :class_name => 'GameCharacter', :dependent => :destroy
 
   has_many :games, :through => :characters, :uniq => true
+
+	def has_same_game_with user
+		games.each do |game|
+			return true if user.games.include? game
+		end
+		return false
+	end
 
   # album
   belongs_to :avatar
@@ -62,10 +95,6 @@ class User < ActiveRecord::Base
   # events
   has_many :participations, :foreign_key => 'participant_id', :conditions => "status = 3 or status = 4 or status = 5"
 
-  has_many :event_requests, :foreign_key => 'participant_id', :conditions => {:status => 1}
-
-  has_many :event_invitations, :foreign_key => 'participant_id', :conditions => {:stauts => 0}
-
   has_many :events, :foreign_key => 'poster_id', :order => 'created_at DESC'
 
   has_many :upcoming_events, :order => 'created_at DESC', :through => :participations, :source => :event, 
@@ -75,20 +104,62 @@ class User < ActiveRecord::Base
            :conditions => ["events.start_time < ?", Time.now.to_s(:db)]
 
   # polls
-  has_many :votes, :foreign_key => 'subscriber_id'
+  has_many :votes, :foreign_key => 'voter_id'
 
   has_many :polls, :foreign_key => 'poster_id', :order => 'created_at DESC'
 
   has_many :participated_polls, :through => :votes, :uniq => true, :source => 'poll', :order => 'created_at DESC'
 
+	# guilds
+	has_many :memberships
+
+	has_many :guilds, :through => :memberships, :conditions => "memberships.status = 3"
+
+	has_many :participated_guilds, :through => :memberships, :source => :guild
+
+	# invitation and requests
+	has_many :event_requests, :through => :events, :source => :requests
+
+	has_many :event_invitations, :class_name => 'Participation', :foreign_key => 'participant_id', :conditions => {:status => 0}
+
+	has_many :poll_invitations 
+
+	has_many :guild_requests, :class_name => 'Membership', :foreign_key => 'president_id', :conditions => {:status => [1,2]}
+
+	has_many :guild_invitations, :class_name => 'Membership',:conditions => {:status => 0}
+
+	has_many :friend_requests, :class_name => 'Friendship', :foreign_key => 'friend_id', :conditions => {:status => 0}
+
+	# feeds
+	has_many :feed_deliveries, :foreign_key => 'recipient_id', :order => 'created_at DESC'
+
+	has_many :feed_items, :through => :feed_deliveries, :order => 'created_at DESC'
+
+	has_many :status_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Status'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :blog_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Blog'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :video_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Video'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :event_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Event'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :participation_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Participation'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :membership_feed_items, :through => :feed_deliveries,
+					 :conditions => "feed_items.originator_type = 'Membership'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :poll_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Poll'", :order => 'created_at DESC', :source => 'feed_item'
+
+	has_many :vote_feed_items, :through => :feed_deliveries, 
+					 :conditions => "feed_items.originator_type = 'Vote'", :order => 'created_at DESC', :source => 'feed_item'
+
   attr_accessor :password, :password_confirmation
-
-  # following methods are about privilege
-
-  def has_friend? user
-    return true
-  end
-
 
   # following methods are about authentication
 

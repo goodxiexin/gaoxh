@@ -1,0 +1,29 @@
+<% content_for :left do %>
+  <%= render :partial => '/app_menu' %>
+  <div class='part'>
+    <h3>搜索:</h3>
+    <%= text_field_tag 'search' %>
+    <%= observe_field :search,
+                      :complete => "facebox.watchClickEvents();",
+                      :update => 'events',
+                      :frequency => 1,
+                      :url => search_guild_events_url(@guild),
+                      :with => "'key='+$('search').value",
+                      :method => :get %>
+  </div>
+<% end %>
+
+<div>
+	<%= link_to '热门活动', hot_events_url(:id => current_user.id) %> |
+	<%= link_to '最新活动', recent_events_url(:id => current_user.id) %> |
+	<%= link_to "我发起的活动", events_url(:id => current_user.id) %> |
+	<%= link_to "我要参加的活动", upcoming_events_url(:id => current_user.id) %> |
+	<%= link_to "我参加过的活动", participated_events_url(:id => current_user.id) %>|
+	<%= link_to '朋友的活动', event_feeds_url %>|
+	<%= link_to '创建新活动', new_event_url %> |
+	<%= link_to "工会#{guild_link @guild}的活动", guild_events_url(@guild) %> 
+</div>
+
+<div id='events'>
+  <%= render :partial => 'event/event_items', :object => @events %>
+</div>

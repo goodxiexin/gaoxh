@@ -1,0 +1,8 @@
+<% delivery = participation_feed_delivery %>
+<% participation = delivery.feed_item.originator %>
+<div id='feed_delivery_<%= delivery.id %>'>
+	<div><%= avatar participation.participant %></div>
+	<div><%= profile_link participation.participant %>参加了活动<%= event_link participation.event %></div>
+	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
+	<div><%= ftime delivery.created_at %></div>
+</div>

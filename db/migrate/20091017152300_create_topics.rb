@@ -4,10 +4,10 @@ class CreateTopics < ActiveRecord::Migration
       t.integer :forum_id
       t.integer :poster_id
       t.string :subject
+			t.text :content
       t.integer :posts_count, :default => 0
-      t.text :content
       t.boolean :top, :default => false
-
+			t.integer :last_post_id
       t.timestamps
     end
   end

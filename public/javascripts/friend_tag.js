@@ -40,7 +40,8 @@ FriendTagBuilder = Class.create({
   },
 
   remove_tag: function(friend_id, tag_id){
-    new Ajax.Request('/friend_tags/delete_tag?id=' + tag_id, {
+    new Ajax.Request('/friend_tags/' + tag_id, {
+			method: 'delete',
       onSuccess: function(transport){
         var tag = this.tags.unset(friend_id);
         if(tag) tag.remove();
@@ -90,7 +91,7 @@ FriendTagBuilder = Class.create({
   },
 
   get_games: function(){
-    new Ajax.Request('/base/friend_tags/games_list', {
+    new Ajax.Request('/friend_tags/games_list', {
       method: 'get',
       onSuccess: function(transport){
         this.selector.innerHTML = transport.responseText;
@@ -102,7 +103,7 @@ FriendTagBuilder = Class.create({
   },
 
   get_friends: function(game_id){
-    new Ajax.Request('/base/friend_tags/friends_list?game_id=' + game_id, {
+    new Ajax.Request('/friend_tags/friends_list?game_id=' + game_id, {
       method: 'get',
       onSuccess: function(transport){
         this.friends_list.innerHTML = transport.responseText;

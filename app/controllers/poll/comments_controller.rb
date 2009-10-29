@@ -1,4 +1,4 @@
-class Poll::CommentsController < Base::CommentsController
+class Poll::CommentsController < CommentsController
 
 protected
 

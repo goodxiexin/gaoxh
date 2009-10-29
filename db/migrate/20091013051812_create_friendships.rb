@@ -4,6 +4,7 @@ class CreateFriendships < ActiveRecord::Migration
       t.integer :friend_id
       t.integer :user_id
       t.integer :status
+			t.string :data
       t.timestamps
     end
   end

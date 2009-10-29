@@ -4,13 +4,7 @@ class Guild::RequestsController < ApplicationController
 
   before_filter :login_required, :setup
 
-  before_filter :owner_required, :only => [:index, :accept, :decline]
-
-  # anyone can request to be the member of the guild
-
-  def index
-    @requests = @guild.requests.paginate :page => params[:page], :per_page => params[:per_page]
-  end
+  before_filter :owner_required, :only => [:accept, :decline]
 
   def new
     render :action => 'new', :layout => false
@@ -29,7 +23,7 @@ class Guild::RequestsController < ApplicationController
   def accept
     if @request.update_attribute('status', @request.status + 3)
       render :update do |page|
-        page << "alert('成功'); $('guild_request_#{@request.id}').remove();"
+        page << "alert('成功'); $('guild_request_option_#{@request.id}').innerHTML = '已接受';"
       end
     else
       render :update do |page|
@@ -41,21 +35,19 @@ class Guild::RequestsController < ApplicationController
   def decline
     @request.destroy
     render :update do |page|
-      page << "facebox.close(); $('evenet_request_#{@request.id}').remove();"
+      page << "facebox.close(); $('evenet_request_option_#{@request.id}').innerHTML = '已拒绝';"
     end
   end
 
 protected
 
   def setup
-    if ['new', 'create', 'index'].include? params[:action]
+    if ['new', 'create'].include? params[:action]
       @guild = Guild.find(params[:guild_id])
-      @user = @guild.poster
-      @privilege = @guild.privilege
+      @user = @guild.president
     elsif ['accept', 'decline'].include? params[:action]
       @guild = Guild.find(params[:guild_id])
-      @user = @guild.poster
-      @privilege = @guild.privilege
+      @user = @guild.president
       @request = @guild.requests.find(params[:id])
     end
   rescue

@@ -1,8 +1,8 @@
 class CreateVotes < ActiveRecord::Migration
   def self.up
     create_table :votes do |t|
-      t.integer :subscriber_id
-      t.integer :poll_answer_id
+      t.text :answer_ids
+			t.integer :voter_id
       t.integer :poll_id
       t.timestamps
     end

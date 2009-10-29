@@ -5,7 +5,7 @@
       <% @guild.friends[0..2].each do |f| %>
         <tr>
           <td><%= image_tag 'default_guild_small.jpg', :style => "width: 50px" %></td>
-          <td><%= link_to f.name, guild_url(f) %></td>
+          <td><%= guild_link f %></td>
         </tr>
       <% end %>
     </table>

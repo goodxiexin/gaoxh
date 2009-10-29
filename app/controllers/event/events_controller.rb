@@ -97,8 +97,8 @@ protected
 
   def setup
     if ['show', 'edit', 'update', 'destroy'].include? params[:action]
-      @user = current_user
       @event = Event.find(params[:id])
+			@user = @event.poster
     elsif ['index', 'hot', 'recent', 'upcoming', 'participated'].include? params[:action]
       @user = User.find(params[:id])
     elsif ['new', 'create'].include? params[:action]

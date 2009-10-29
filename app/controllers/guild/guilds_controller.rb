@@ -7,7 +7,7 @@ class Guild::GuildsController < ApplicationController
   before_filter :owner_required, :only => [:edit, :update]
 
   def index
-    @guilds = @user.guilds.paginate :page => params[:page], :per_page => 10
+    @guilds = @user.participated_guilds.paginate :page => params[:page], :per_page => 10
   end
 
   def show
@@ -20,7 +20,7 @@ class Guild::GuildsController < ApplicationController
   end
 
   def create
-    @guild = Guild.new(params[:guild])
+    @guild = Guild.new(params[:guild].merge({:president_id => current_user.id}))# virtual attribute
     if @guild.save
       @guild.album.create_cover(params[:photo]) unless params[:photo].blank?
       redirect_to guild_url(@guild)
@@ -41,11 +41,11 @@ class Guild::GuildsController < ApplicationController
   end
 
   def hot
-    @guilds = Guild.find(:all, :conditions => game_conditions, :order => 'members_count DESC').paginate :page => params[:page], :per_page => 10
+    @guilds = Guild.hot(params[:game_id]).paginate :page => params[:page], :per_page => 10
   end
 
   def recent
-    @guilds = Guild.find(:all, :conditions => game_conditions, :order => 'created_at DESC').paginate :page => params[:page], :per_page => 10
+    @guilds = Guild.recent(params[:game_id]).paginate :page => params[:page], :per_page => 10
   end
 
   def search
@@ -68,6 +68,8 @@ protected
     elsif ['show', 'edit', 'update'].include? params[:action]
       @guild = Guild.find(params[:id])
       @user = @guild.president
+		elsif ['new', 'create'].include? params[:action]
+			@user = current_user
     end
   rescue
     not_found

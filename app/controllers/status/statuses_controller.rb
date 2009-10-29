@@ -1,6 +1,6 @@
 class Status::StatusesController < ApplicationController
 
-  layout 'user'
+  layout 'app'
 
   before_filter :login_required, :setup
 
@@ -17,6 +17,7 @@ class Status::StatusesController < ApplicationController
         render :update do |page|
           page.replace_html "latest_status", :inline => "<%= distance_of_time_in_words_to_now(current_user.latest_status.created_at) %> ago: <span id='latest_status_content'><%= current_user.latest_status.content %></span>"
           page.visual_effect :highlight, 'latest_status', :duration => 2
+					page << "$('status_content').clear();"
         end
       else
         render :update do |page|
@@ -25,8 +26,10 @@ class Status::StatusesController < ApplicationController
         end
       end
     else
-      # TODO
-    end
+			render :update do |page|
+				page << "保存时发生错误"
+			end
+		end
   end
 
   def destroy
@@ -39,8 +42,10 @@ class Status::StatusesController < ApplicationController
 protected
 
   def setup
-    if ["index", "create"].include? params[:action]
-      @user = current_user
+    if ["index"].include? params[:action]
+      @user = User.find(params[:id])
+		elsif ["create"].include? params[:action]
+			@user = current_user
     elsif ["destroy"].include? params[:action]
       @user = current_user
       @status = Status.find(params[:id])

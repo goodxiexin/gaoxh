@@ -4,14 +4,14 @@ class Blog::DraftsController < ApplicationController
 
   before_filter :login_required, :setup
 
-  before_filter :owner_required, :only => [:edit, :update]
+  before_filter :owner_required, :only => [:edit, :update, :destroy]
 
   def index
-    @blogs = @user.drafts.paginate :page => params[:page], :per_page => 15
+    @blogs = current_user.drafts.paginate :page => params[:page], :per_page => 15
   end
 
   def create
-    if @blog = @user.drafts.create(params[:blog].merge({:poster_id => @user.id}))
+    if @blog = current_user.drafts.create(params[:blog])
       render :update do |page|
         page.alert "保存成功,继续写吧"
         page << "blog_builder.set_draft_id(#{@blog.id});"
@@ -43,14 +43,13 @@ class Blog::DraftsController < ApplicationController
   end
 
   def destroy
-    if session[:validation_text] == params[:validation_text]
-      @blog.destroy
+		if @blog.destroy
       render :update do |page|
         page.redirect_to drafts_url
       end
     else
       render :update do |page|
-        page << "$('error').innerHTML = 'incorrect validation code'"
+        page << "error('删除的时候发生错误');"
       end
     end
   end

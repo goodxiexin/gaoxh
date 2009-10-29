@@ -1,0 +1,14 @@
+<% delivery = friendship_feed_delivery %>
+<% friendship = delivery.feed_item.originator %>
+<% if friendship_feed.data[:friend] == friendship.user_id # current_user is the friend of friendship.user %>
+	<% user = friendship.user %>
+	<% friend = friendship.friend %>
+<% else %>
+	<% user = friendship.friend %>
+	<% friend = friendship.user %>
+<% end %>
+<div  id='feed_delivery_<%= delivery.id %>'>
+	<%= profile_link user %>和<%= profile_link friend %>成为了好朋友 <%= ftime friendship.created_at %>
+	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
+	<div><%= ftime delivery.created_at %></div>
+</div>	

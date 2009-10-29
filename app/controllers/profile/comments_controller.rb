@@ -1,4 +1,4 @@
-class Profile::CommentsController < Base::CommentsController
+class Profile::CommentsController < CommentsController
 
   before_filter :owner_required, :only => [:destroy]
 

@@ -5,7 +5,13 @@
 <%= render :partial => 'menu' %>
 
 <div id='participations'>
-  <%= render :partial => 'participant', :collection => @participants %>
+	<% if params[:type].to_i == 3 %>
+		<%= render :partial => 'invitee', :collection => @participants %>
+	<% elsif params[:type].to_i == 4 %>
+		<%= render :partial => 'requestor', :collection => @participants %>
+	<% else %>
+		<%= render :partial => 'participant', :collection => @participants %>
+	<% end %>
 </div>
 
 <%= will_paginate @participants %>

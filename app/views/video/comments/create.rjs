@@ -1,5 +1,5 @@
 page.insert_html :bottom, "video_comments_#{@video.id}", :partial => 'comment', :object => @comment
-if @user == @user or @comment.poster == @user
+if @user == current_user or @comment.poster == @user
   page << "facebox.watchClickEvent($('delete_comment_#{@comment.id}'));"
 end
 page << "$('video_comment_content_#{@video.id}').value = '';"

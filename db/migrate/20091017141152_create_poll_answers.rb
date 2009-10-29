@@ -3,7 +3,7 @@ class CreatePollAnswers < ActiveRecord::Migration
     create_table :poll_answers do |t|
       t.string :description
       t.integer :poll_id
-      t.integer :votes, :default => 0
+      t.integer :votes_count, :default => 0
       t.timestamps
     end
   end

@@ -1,15 +1,20 @@
 BlogBuilder = Class.create({
-  initialize: function(content, title, privilege, category, form, tag_builder){
+
+  initialize: function(tag_builder){alert(tag_builder);
     this.draft_id = 0;
-    this.editor = new nicEditor({iconsPath:'/images/nicEditor/icons.gif'}).panelInstance(content);
-    this.form = $(form);
-    this.title = $(title);
-    this.privilege = $(privilege);
-    this.category = $(category);
+    this.editor = new nicEditor({iconsPath:'/images/nicEditor/icons.gif'}).panelInstance('blog_content');
+    this.form = $('blog_form');
+    this.title = $('blog_title');
+    this.privilege = $('blog_privilege');
+    this.category = $('blog_game_id');
     this.tag_builder = tag_builder;
   },
 
   valid: function(){
+		if(this.privilege.value == ''){
+			error("清选择权限");
+			return false;
+		}
     if(this.category.value == ''){
       error("请选择游戏类别");
       return false;

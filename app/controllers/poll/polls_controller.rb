@@ -17,6 +17,8 @@ class Poll::PollsController < ApplicationController
   end
 
   def show
+		@vote = @poll.votes.find_by_voter_id(current_user.id)
+		@votable = (current_user == @user) || (@poll.privilege == 1) || (@poll.privilege == 2 and @user.has_friend? current_user)
     @comments = @poll.comments.user_viewable(current_user.id)
   end
 

@@ -1,4 +1,4 @@
-class Guild::CommentsController < Base::CommentsController
+class Guild::CommentsController < CommentsController
 
   layout 'app'
 

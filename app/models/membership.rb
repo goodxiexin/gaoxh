@@ -2,7 +2,17 @@ class Membership < ActiveRecord::Base
 
   belongs_to :user
 
-  belongs_to :guild, :counter_cache => :members_count
+  belongs_to :guild
+
+	has_many :feed_items, :as => 'originator', :dependent => :destroy
+
+	has_conditional_counter :guild, :status, 
+												 {:invitees_count => 0, :requestors_count => [1,2], :members_count => 5, :veterans_count => 4, :presidents_count => 3, :all_count => [3,4,5]}
+
+	def before_create
+		return if status == 3
+		self.president_id = guild.president.id
+	end
 
   def validate_on_create
     membership = guild.memberships.find_by_user_id(user_id)

@@ -5,8 +5,8 @@
     <table>
     <% events[0..2].each do |event| %>
       <tr>
-        <td><%= event_album_cover event, :small %></td>
-        <td><%= link_to event.title, event_url(event) %><br/><span class='fby-tiny'><%= ftime event.created_at %></span></td>
+        <td><%= album_cover event.album, :small %></td>
+        <td><%= event_link event %><br/><span class='fby-tiny'><%= ftime event.created_at %></span></td>
       </tr>
     <% end %>
     </table>
