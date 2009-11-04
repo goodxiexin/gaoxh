@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091028102747) do
+ActiveRecord::Schema.define(:version => 20091028163642) do
 
   create_table "albums", :force => true do |t|
     t.string   "type"
@@ -68,6 +68,14 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.integer  "commentable_id"
     t.string   "commentable_type"
     t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "conversations", :force => true do |t|
+    t.integer  "messages_count", :default => 0
+    t.integer  "sender_id"
+    t.integer  "recipient_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -305,6 +313,11 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.integer  "guild_id"
     t.integer  "president_id"
     t.integer  "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "messages", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
