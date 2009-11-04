@@ -32,7 +32,6 @@ class Video::VideosController < ApplicationController
   end
 
   def show
-    @comments = @video.comments.user_viewable(@user.id)
   end
 
   def edit
@@ -69,7 +68,7 @@ class Video::VideosController < ApplicationController
   end
 
 	def relative
-		@videos = Video.relative_to(@user.id, params[:game_id]).paginate :page => params[:page], :per_page => 10
+		@videos = @user.relative_videos.paginate :page => params[:page], :per_page => 10
 	end
 
 protected

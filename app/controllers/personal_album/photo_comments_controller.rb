@@ -7,11 +7,9 @@ protected
   def catch_commentable
     @photo = PersonalPhoto.find(params[:personal_photo_id])
     @album = @photo.album
-    @user = @album.user
+    @user = @album.poster
     @commentable = @photo
 		@privilege =@album.privilege
-  rescue
-    not_found
   end
 
 end

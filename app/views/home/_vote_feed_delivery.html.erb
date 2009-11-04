@@ -1,8 +1,7 @@
 <% delivery = vote_feed_delivery %>
 <% vote = delivery.feed_item.originator %>
-<div id='feed_delivery_<%= delivery.id %>'>
-	<div><%= avatar vote.voter %></div>
-	<div><%= profile_link  vote.voter %>参加了投票<%= poll_link vote.poll %></div>
-	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
-	<div><%= ftime delivery.created_at %></div>
-</div>
+<div class='feed-list' id='feed_delivery_<%= delivery.id %>'>
+  <div class="feed-icon icon-friend"></div>
+  <p><%= profile_link vote.voter %> 参与了投票 <%= poll_link vote.poll %> </p>
+  <div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
+</div> 

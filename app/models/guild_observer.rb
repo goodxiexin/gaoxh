@@ -1,7 +1,7 @@
 class GuildObserver < ActiveRecord::Observer
 
   def after_create(guild)
-    guild.create_album
+    guild.create_album(:title => "工会#{guild.name}的相册", :privilege => 1, :game_id => guild.game_id, :poster_id => guild.president_id)
     guild.memberships.create(:user_id => guild.president_id, :status => 3)
     forum = guild.create_forum(:name => "工会#{guild.name}的论坛", :description => "工会#{guild.name}的论坛")
     ModeratorForum.create(:moderator_id => guild.president_id, :forum_id => forum.id)

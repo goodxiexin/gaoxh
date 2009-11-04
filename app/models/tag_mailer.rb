@@ -1,51 +1,35 @@
 class TagMailer < ActionMailer::Base
 
   def blog_tag(tag)
-    setup_email(tag)
-    @subject += "#{@user.login}在博客#{@resource.title}里标记了你"
-    body[:url] = "http://localhost:3000/users/#{@user.id}/blogs/#{@resource.id}"
+    setup_email	tag
+		subject			"Dayday3 - #{tag.poster.login}在博客里标记了你"
+		body				:user => tag.tagged_user, :url => "#{SITE_URL}/blogs/#{tag.taggable.id}"
   end
 
   def video_tag(tag)
-    setup_email(tag)
-    @subject += "#{@user.login}在视频#{@resource.title}里标记了你"
-    body[:url] = "http://localhost:3000/users/#{@user.id}/videos/#{@resource.id}"
-  end
+		setup_email tag
+    subject     "Dayday3 - #{tag.poster.login}在视频里标记了你"
+    body        :user => tag.tagged_user, :url => "#{SITE_URL}/videos/#{tag.taggable.id}"
+	end
 
   def photo_tag(tag)
-    @user = tag.user
-    @tagged_user = tag.tagged_user
-    @photo = tag.photo
-    @album = @photo.album
-    @recipients = @tagged_user.email
-    @from = "gaoxh04@gmail.com"
-    @sent_on = Time.now
-    @subject = "Dayday3 - #{@user.login}在相册#{@album.title}里标记了你"
-    body[:url] = "http://localhost:3000/albums/#{@album.id}/photos/#{@photo.id}"
+		setup_email tag
+    subject     "Dayday3 - #{tag.poster.login}在相册里标记了你"
+    body        :user => tag.tagged_user, :url => "#{SITE_URL}/#{tag.photo.class.to_s.underscore.pluralize}/#{tag.taggable_id}"
   end
 
   def photo_tag_to_owner(tag)
-    @user = tag.user
-    @tagged_user = tag.tagged_user
-    @photo = tag.photo
-    @album = @photo.album
-    @from = "gaoxh04@gmail.com"
-    @sent_on = Time.now
-    @recipients = @album.user.email
-    @subject = "Dayday3 - #{@user.login}在你的相册#{@album.title}里标记了#{@tagged_user.login}"
-    body[:url] = "http://localhost:3000/albums/#{@album.id}/photos/#{@photo.id}"
-  end
+	  setup_email tag
+    subject     "Dayday3 - #{tag.poster.login}标记了你的相册"
+    body        :user => tag.tagged_user, :url => "#{SITE_URL}/#{tag.photo.class.to_s.underscore.pluralize}/#{tag.taggable_id}"
+	end
 
 protected
 
   def setup_email(tag)
-    @user = tag.user
-    @tagged_user = tag.tagged_user
-    @resource = tag.tag_owner
-    @recipients = @tagged_user.email
-    @from = "gaoxh04@gmail.com"
-    @subject = "Dayday3 - "
-    @sent_on = Time.now
+		recipients	tag.tagged_user.email
+		from				SITE_MAIL
+		sent_on			Time.now
   end
 
 end

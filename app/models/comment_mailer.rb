@@ -36,6 +36,12 @@ class CommentMailer < ActionMailer::Base
     body        :user => user, :url => "#{SITE_URL}/#{comment.commentable.class.to_s.underscore}s/#{comment.commentable_id}"
 	end
 
+	def album_comment(comment, user)
+		setup_email user
+		subject			"Dayday3 - #{comment.poster.login}在相册#{comment.commentable.title}发表评论"
+		body				:user => user, :url => "#{SITE_URL}/#{comment.commentable.class.to_s.underscore}s/#{comment.commentable_id}"
+	end
+
   def status_comment(comment,user)
     setup_email user
 		subject     "Dayday3 - #{comment.poster.login}在你的状态里留言了"

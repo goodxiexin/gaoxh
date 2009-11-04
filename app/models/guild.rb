@@ -22,6 +22,8 @@ class Guild < ActiveRecord::Base
 
   has_one :president, :through => :memberships, :source => 'user', :conditions => "memberships.status = 3"
 
+	has_many :veterans_and_members, :through => :memberships, :source => 'user', :conditions => "memberships.status = 4 or memberships.status = 5"
+
   has_many :president_and_veterans, :through => :memberships, :source => 'user', :conditions => "memberships.status = 3 or memberships.status = 4"
 
   has_one :album, :class_name => 'GuildAlbum', :foreign_key => 'owner_id'

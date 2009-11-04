@@ -1,5 +1,11 @@
 class FriendTagsController < ApplicationController
 
+	before_filter :login_required
+
+	before_filter :setup, :only => [:destroy]
+
+	before_filter :owner_required, :only => [:destroy]
+
   def games_list
     render :partial => 'games_list', :object => current_user.games
   end
@@ -15,13 +21,24 @@ class FriendTagsController < ApplicationController
   end
 
   def friends_auto_complete
-    @friends = current_user.friends.find_all {|f| f.login.include?(params[:user][:login]) }
+    @friends = current_user.friends.find_all {|f| f.login.include?(params[:friend][:login]) }
     render :partial => 'friends' 
   end
 
 	def destroy
-		FriendTag.find(params[:id]).destroy
+		@tag.destroy
 		render :nothing => true
 	end
 
+protected
+
+	def setup
+		@tag = FriendTag.find(params[:id])
+		@taggable = @tag.taggable
+		@user = @taggable.poster
+	rescue
+		not_found
+	end
+
 end
+

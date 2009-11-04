@@ -15,7 +15,7 @@ class Blog::BlogsController < ApplicationController
   end
 
   def show
-    @comments = @blog.comments.user_viewable(current_user.id)
+    @comments = @blog.comments
   end
 
   def new
@@ -23,7 +23,7 @@ class Blog::BlogsController < ApplicationController
   end
 
   def create
-    if @blog = Blog.create(params[:blog].merge({:poster_id => current_user.id}))
+    if @blog = current_user.blogs.create(params[:blog].merge({:poster_id => current_user.id}))
       redirect_to blog_url(@blog)
     else
       render :action => 'new'
@@ -35,7 +35,6 @@ class Blog::BlogsController < ApplicationController
   def edit
   end
 
-  # TODO: what if tags are stored while blog's validation fails
   def update
     if @blog.update_attributes(params[:blog].merge({:draft => false}))
       redirect_to blog_url(@blog)
@@ -67,7 +66,7 @@ class Blog::BlogsController < ApplicationController
   end
 
 	def relative
-		@blogs = Blog.relative_to(@user.id, params[:game_id]).paginate :page => params[:page], :per_page => 10 
+		@blogs = @user.relative_blogs.paginate :page => params[:page], :per_page => 10 
 	end
 
 protected

@@ -3,7 +3,6 @@ class CreateComments < ActiveRecord::Migration
     create_table :comments do |t|
       t.integer :poster_id
       t.integer :recipient_id
-      t.boolean :whisper, :default => false
       t.integer :commentable_id
       t.string :commentable_type
       t.text :content

@@ -2,7 +2,7 @@ class CreateFriendTags < ActiveRecord::Migration
   def self.up
     create_table :friend_tags do |t|
       t.integer :poster_id
-      t.integer :friend_id
+      t.integer :tagged_user_id
       t.integer :taggable_id
       t.string :taggable_type
       t.timestamps

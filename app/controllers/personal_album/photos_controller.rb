@@ -14,13 +14,13 @@ class PersonalAlbum::PhotosController < ApplicationController
   end
 
   def show
-    @comments = @photo.comments.user_viewable(current_user.id)
+    @comments = @photo.comments
   end
 
   def create_multiple
     @photos = []
     params[:photos].each do
-      |attributes|  @photos << @album.photos.create(attributes)
+      |attributes|  @photos << @album.photos.create(attributes.merge({:poster_id => current_user.id, :game_id => @album.game_id}))
     end
 		# hack
 		if @user.application_setting.emit_photo_feed
@@ -28,6 +28,7 @@ class PersonalAlbum::PhotosController < ApplicationController
 			@album.poster.friends.each do |f|
 				f.feed_deliveries.create(:feed_item_id => item.id) if f.application_setting.recv_photo_feed
 			end
+			@album.update_attribute('uploaded_at', Time.now)
 		end
     redirect_to edit_multiple_personal_photos_url(:album_id => @album.id, :ids => @photos.map {|p| p.id}) 
   end 
@@ -44,7 +45,7 @@ class PersonalAlbum::PhotosController < ApplicationController
           page.redirect_to personal_photo_url(@photo)
         else
           page << "facebox.close();"
-          page << "$('personal_photo_notation_#{@photo.id}').innerHTML = '#{@photo.notation}';"
+          page << "if($('personal_photo_notation_#{@photo.id}'))$('personal_photo_notation_#{@photo.id}').innerHTML = '#{@photo.notation}';"
         end
       end 
     else
@@ -78,7 +79,6 @@ class PersonalAlbum::PhotosController < ApplicationController
 	# hot photos can come from event album, guild album, avatar album as well
 	def hot
 		@photos = Photo.hot(params[:game_id]).paginate :page => params[:page], :per_page => 10
-		logger.error @photos.count
 	end
 
 	def relative

@@ -6,8 +6,6 @@ class Video < ActiveRecord::Base
 
 	acts_as_commentable :order => 'created_at ASC'
 
-	acts_as_friend_taggable :class_name => 'FriendTag'
-
 	acts_as_diggable
 
   acts_as_list :order => 'created_at', :scope => 'poster_id'
@@ -15,6 +13,10 @@ class Video < ActiveRecord::Base
 	acts_as_global_resources
 
 	has_many :feed_items, :dependent => :destroy, :as => 'originator'
+
+	has_many :tags, :class_name => 'FriendTag', :as => 'taggable', :dependent => :destroy
+
+	has_many :relative_users, :through => :tags, :source => 'tagged_user'
  
   validate do |video|
     video.errors.add_to_base('标题不能为空') if video.title.blank?
@@ -44,7 +46,7 @@ class Video < ActiveRecord::Base
   end
  
   def tags=(ids)
-    poster.friends.find(ids).each { |f| tags.build(:poster_id => poster_id, :friend_id => f.id) }
+    poster.friends.find(ids).each { |f| tags.build(:poster_id => poster_id, :tagged_user_id => f.id) }
   rescue
     raise FriendTag::TagNoneFriendError
   end

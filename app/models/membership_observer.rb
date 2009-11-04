@@ -26,9 +26,11 @@ class MembershipObserver < ActiveRecord::Observer
 		if membership.status_was == 0 and [3,4,5].include? membership.status
 			# invitation accepted
 			guild.president.notifications.create(:data => "#{profile_link user}接受了你的邀请，参加工会#{guild_link guild}")
+			user.decrement! :invitations_count
 		elsif [1,2].include? membership.status_was and [3,4,5].include? membership.status
 			# request accepted
 			user.notifications.create(:data => "#{profile_link guild.president}同意你加入工会#{guild_link guild}的请求")
+			guild.president.decrement! :requests_count
 		elsif [4,5].include? membership.status_was and [4,5].include? membership.status and membership.status_changed?
 			# nomination
 			user.notifications.create(:data => "你在工会#{guild_link guild}里的职务更改为#{role membership.status}")
@@ -41,9 +43,11 @@ class MembershipObserver < ActiveRecord::Observer
 		if membership.status == 0
 			# invitation declined
 			guild.president.notifications.create(:data => "#{profile_link user}拒绝了你的邀请，参加工会#{guild_link guild}")
+			user.decrement! :invitations_count
 		elsif [1,2].include? membership.status
 			# request declined
 			user.notifications.create(:data => "#{profile_link guild.president}决绝你加入工会#{guild_link guil}的请求")
+			guild.president.decrement! :requests_count
 		end	
 	end
 

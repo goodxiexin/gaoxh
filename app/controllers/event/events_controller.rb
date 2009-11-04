@@ -17,7 +17,8 @@ class Event::EventsController < ApplicationController
   def show
     @participation = @event.participations.find_by_participant_id(current_user.id)
     @album = @event.album
-    @comments = @event.comments.user_viewable(current_user.id).paginate :page => params[:page], :per_page => 10
+    @comments = @event.comments.paginate :page => params[:page], :per_page => 10
+		render :action => 'show', :layout => 'app2'
   end
 
   def new
@@ -47,7 +48,7 @@ class Event::EventsController < ApplicationController
   def destroy
     @event.destroy
     render :update do |page|
-      page.redirect_to events_url
+      page.redirect_to events_url(:id => @user.id)
     end
   end  
 

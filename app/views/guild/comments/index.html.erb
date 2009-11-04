@@ -1,22 +1,29 @@
-<% if @membership %>
-  <% form_remote_for :comment, :url => guild_comments_url(@guild) do |f| %>
-      <div class='composer'>
-        <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_textarea(this, 140, $('comment_words_count'));" %>
-      </div>
-      <div class='button'>
-        <%= f.submit '提交', :class => 'confirm-button' %>
-        <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
-      </div>
+<div class='box02 canvas_con'>
+<% if [3,4,5].include? @membership.status %>
+<div class="bookbox">
+    <h3><label for="book">留言板</label>(<%= link_to "查看所有", guild_comments_url(@guild) %>)</h3>
+    <div class="formcontent s_clear">
+      <% form_remote_for :comment, :url => guild_comments_url(@guild), :condition => "validate_comment($('comment_content'))" do |f| %>
+        <%= hidden_field_tag 'comment[recipient_id]', @guild.president.id %>
+        <div class="rows">
+          <div class="textarea-wrap"><div class="textarea-wide">
+            <%= f.text_area 'content', :class => 'textarea' %>
+          </div></div>
+        </div> 
+        <div class="buttons">
+          <span class="button"><span><button type="submit">发布</button></span></span>
+          <%= emotion_link 'comment_content' %>
+        </div>
       <% end %>
-      <div id="comment_words_count" class="status-count">0/140</div>
-      <div><%= emotion_link 'comment_content' %></div>
+    </div>
+  </div>
 <% else %>
-  <%= "你必须加入活动才能留言，点击#{ link_to '这里', guild_url(@guild) }查看活动详情" %>
+  <%= "你必须加入工会才能留言，点击#{ link_to '这里', guild_url(@guild) }查看活动详情" %>
 <% end %>
 
-<div id='comments'>
-  <%= render :partial => 'comment', :collection => @comments %>
+<div class="feed-box" id='comments'>
+  <%= render :partial => 'guild/comments/comment', :collection => @comments %>
 </div>
 
 <%= will_paginate @comments %>
+</div>

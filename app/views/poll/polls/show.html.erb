@@ -86,24 +86,4 @@
 评论(<%= @poll.comments_count %>)
 </div>
 
-<div id='comments'>
-  <%= render :partial => 'poll/comments/comment', :collection => @comments %>
-</div>
-
-<div class='msg-body'>
-  <% form_remote_for :comment, :url => poll_comments_url(@poll) do |f| %>
-  <div class='composer'>
-    <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-    <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "limit_words_of_textarea(this, 140, $('words_count'));" %>
-  </div>
-  <div class='button'>
-    <%= f.submit '提交', :class => 'confirm-button' %>
-    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
-  </div>
-  <% end %>
-  <div id='words_count'>0/140</div>
-  <div class='emotion'>
-    <%= emotion_link "comment_content" %>
-  </div>
-</div>
-
+<%= render :partial => 'comments/comment_box', :locals => {:type => 'poll', :commentable => @poll} %>

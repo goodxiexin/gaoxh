@@ -11,7 +11,8 @@ class CreateAlbums < ActiveRecord::Migration
       t.string :title
       t.text :description
       t.integer :comments_count, :default => 0
-      t.timestamps
+			t.datetime :uploaded_at
+			t.datetime :created_at
     end
   end
 

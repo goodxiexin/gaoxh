@@ -1,8 +1,10 @@
 class CreateMessages < ActiveRecord::Migration
   def self.up
     create_table :messages do |t|
-
-      t.timestamps
+			t.text		:content
+			t.integer	:sender_id
+			t.integer	:recipient_id
+			t.timestamps
     end
   end
 

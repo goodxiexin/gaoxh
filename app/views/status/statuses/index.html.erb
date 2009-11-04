@@ -6,6 +6,7 @@
 
 <%= render :partial => 'status/menu' %>
 
+<% if @user == current_user %>
 <div class='status-update'>
   <h3 class="currentStatus">你正在干嘛？</h3>
   <div class='status-edit'>
@@ -17,7 +18,8 @@
   <div id="words_count" class="status-count">0/140</div>
   <div><%= emotion_link 'status_content' %></div>
 </div>
- 
+<% end %>
+
 <div class='status-list'>
 <ul id='statuses'>
   <%= render :partial => 'status', :collection => @statuses %> 

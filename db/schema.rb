@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091028102747) do
+ActiveRecord::Schema.define(:version => 20091028163642) do
 
   create_table "albums", :force => true do |t|
     t.string   "type"
@@ -22,8 +22,8 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.string   "title"
     t.text     "description"
     t.integer  "comments_count", :default => 0
+    t.datetime "uploaded_at"
     t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "application_settings", :force => true do |t|
@@ -64,10 +64,18 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
   create_table "comments", :force => true do |t|
     t.integer  "poster_id"
     t.integer  "recipient_id"
-    t.boolean  "whisper",          :default => false
     t.integer  "commentable_id"
     t.string   "commentable_type"
     t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "conversations", :force => true do |t|
+    t.integer  "messages_count", :default => 0
+    t.integer  "sender_id"
+    t.integer  "recipient_id"
+    t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -117,6 +125,7 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
 
   create_table "feed_deliveries", :force => true do |t|
     t.integer  "recipient_id"
+    t.string   "recipient_type"
     t.integer  "feed_item_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -143,7 +152,7 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
 
   create_table "friend_tags", :force => true do |t|
     t.integer  "poster_id"
-    t.integer  "friend_id"
+    t.integer  "tagged_user_id"
     t.integer  "taggable_id"
     t.string   "taggable_type"
     t.datetime "created_at"
@@ -309,6 +318,14 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.datetime "updated_at"
   end
 
+  create_table "messages", :force => true do |t|
+    t.text     "content"
+    t.integer  "sender_id"
+    t.integer  "recipient_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "moderator_forums", :force => true do |t|
     t.integer  "forum_id"
     t.integer  "moderator_id"
@@ -336,6 +353,7 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
 
   create_table "photo_tags", :force => true do |t|
     t.integer  "poster_id"
+    t.integer  "photo_id"
     t.integer  "tagged_user_id"
     t.integer  "taggable_id"
     t.string   "taggable_type"
@@ -356,7 +374,7 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.integer  "album_id"
     t.integer  "user_id"
     t.integer  "game_id"
-    t.integer  "position"
+    t.integer  "poster_id"
     t.text     "notation"
     t.integer  "parent_id"
     t.string   "content_type"
@@ -470,7 +488,7 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
   end
 
   create_table "statuses", :force => true do |t|
-    t.integer  "user_id"
+    t.integer  "poster_id"
     t.text     "content"
     t.integer  "comments_count", :default => 0
     t.datetime "created_at"
@@ -525,8 +543,8 @@ ActiveRecord::Schema.define(:version => 20091028102747) do
     t.integer  "videos_count",                            :default => 0
     t.integer  "statuses_count",                          :default => 0
     t.integer  "comments_count",                          :default => 0
-    t.integer  "event_requests_count",                    :default => 0
-    t.integer  "event_invitations_count",                 :default => 0
+    t.integer  "requests_count",                          :default => 0
+    t.integer  "invitations_count",                       :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

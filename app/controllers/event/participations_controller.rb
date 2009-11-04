@@ -1,6 +1,6 @@
 class Event::ParticipationsController < ApplicationController
 
-  layout 'user'
+  layout 'app2'
 
   before_filter :login_required, :setup
 

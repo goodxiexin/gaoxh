@@ -1,6 +1,6 @@
 class Guild::CommentsController < CommentsController
 
-  layout 'app'
+  layout 'app2'
 
   before_filter :catch_membership, :only => [:index, :create]
 

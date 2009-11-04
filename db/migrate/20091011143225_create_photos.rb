@@ -8,8 +8,8 @@ class CreatePhotos < ActiveRecord::Migration
       t.integer :album_id
       t.integer :user_id
 			t.integer :game_id
-      t.integer :position
-      t.text :notation
+      t.integer :poster_id
+			t.text :notation
 
       # attachment_fu fields
       t.integer :parent_id

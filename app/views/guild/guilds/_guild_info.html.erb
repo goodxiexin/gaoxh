@@ -1,12 +1,14 @@
-<div class='fby'>
-  <h3>Icon: <%= link_to_function 'fold', "$('side_info').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
-  <div id='side_info'>
-    <%= label_tag '', '成立于:' %><span class='fby-tiny'><%= ftime @guild.created_at %></span><br/>
-    <%= label_tag '', '游戏:' %><span class='fby-tiny'><%= @guild.game.name %></span><br/>
-    <%= label_tag '', '会长:' %>
-    <span class='fby-tiny'>
-      <%= profile_link @guild.president %>
-    </span>
-  </div>
-</div>
-
+  <table>
+    <tr>
+      <td class="id">成立：</td>
+      <td class="value"><%= ftime2 @guild.created_at %></td>
+    </tr>
+    <tr>
+      <td class="id">游戏：</td>
+      <td class="value"><%= @guild.game.name %></td>
+    </tr>
+    <tr>
+      <td class="id">会长：</td>
+      <td class="value"><%= profile_link @guild.president %></td>
+    </tr>
+  </table>

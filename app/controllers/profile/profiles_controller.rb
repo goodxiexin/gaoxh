@@ -1,6 +1,6 @@
 class Profile::ProfilesController < ApplicationController
 
-  layout 'user'
+  layout 'app2'
 
   before_filter :login_required, :setup
 
@@ -11,9 +11,12 @@ class Profile::ProfilesController < ApplicationController
 	before_filter :owner_required, :only => [:edit, :update]
 
   def show
-		@comments = @profile.comments.user_viewable(current_user.id).paginate :page => params[:page], :per_page => 10
+		@comments = @profile.comments.paginate :page => params[:page], :per_page => 10
     @tagging = @profile.taggings.find_by_poster_id(current_user.id)
 		@taggable = @user.friends.include?(current_user) && (@tagging.nil? || @tagging.created_at < 1.week.ago)
+		@blogs = @user.blogs[0..2]
+		@albums = @user.albums.viewable(relationship).push(@user.avatar_album)[0..2]
+		@feed_deliveries = @profile.feed_deliveries
 	end
 
   def edit

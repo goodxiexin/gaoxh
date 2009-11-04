@@ -176,7 +176,7 @@ ProfileManager = Class.create({
 	},
 
 	leave_new_character_info: function(){
-		this.ginfo_body = this.old_ginfo;
+		this.ginfo_body.innerHTML = this.old_ginfo;
 	},
 
 	create_character_info: function(){

@@ -5,7 +5,8 @@ class User < ActiveRecord::Base
   has_one :profile, :dependent => :destroy
 
 	# mails
-	has_many :out_mails, :class_name => 'Mail', :foreign_key => 'sender_id', :conditions => { :delete_by_sender => false }, :order => 'created_at DESC'
+	has_many :out_mails, :class_name => 'Mail', :foreign_key => 'sender_id', 
+					 :conditions => { :delete_by_sender => false }, :order => 'created_at DESC'
 
   has_many :in_mails, :class_name => 'Mail', :foreign_key => 'recipient_id', 
 					 :conditions => { :delete_by_recipient => false }, :order => 'created_at DESC'  
@@ -31,9 +32,9 @@ class User < ActiveRecord::Base
 	has_many :poke_deliveries, :foreign_key => 'recipient_id', :order => 'created_at DESC'
 
 	# status
-  has_many :statuses, :order => 'created_at DESC', :dependent => :destroy
+  has_many :statuses, :foreign_key => 'poster_id', :order => 'created_at DESC', :dependent => :destroy
 
-	has_one :latest_status, :class_name => 'Status', :order => 'created_at DESC'
+	has_one :latest_status, :foreign_key => 'poster_id', :class_name => 'Status', :order => 'created_at DESC'
 
   # friend
 	has_many :all_friendships, :class_name => 'Friendship'
@@ -82,7 +83,7 @@ class User < ActiveRecord::Base
 
   has_one :avatar_album, :foreign_key => 'owner_id'
 
-  has_many :albums, :class_name => 'PersonalAlbum', :foreign_key => 'owner_id', :order => 'created_at DESC'
+  has_many :albums, :class_name => 'PersonalAlbum', :foreign_key => 'owner_id', :order => 'uploaded_at DESC'
 
   # blogs
   has_many :blogs, :conditions => {:draft => false}, :order => 'created_at DESC', :dependent => :destroy, :foreign_key => :poster_id
@@ -95,7 +96,8 @@ class User < ActiveRecord::Base
   # events
   has_many :participations, :foreign_key => 'participant_id', :conditions => "status = 3 or status = 4 or status = 5"
 
-  has_many :events, :foreign_key => 'poster_id', :order => 'created_at DESC'
+  has_many :events, :foreign_key => 'poster_id', :order => 'created_at DESC',
+					 :conditions => ["events.start_time >= ?", Time.now.to_s(:db)]
 
   has_many :upcoming_events, :order => 'created_at DESC', :through => :participations, :source => :event, 
            :conditions => ["events.start_time >= ?", Time.now.to_s(:db)]
@@ -115,7 +117,8 @@ class User < ActiveRecord::Base
 
 	has_many :guilds, :through => :memberships, :conditions => "memberships.status = 3"
 
-	has_many :participated_guilds, :through => :memberships, :source => :guild
+	has_many :participated_guilds, :through => :memberships, :source => :guild, 
+					 :conditions => "memberships.status = 3 or memberships.status = 4 or memberships.status = 5"
 
 	# invitation and requests
 	has_many :event_requests, :through => :events, :source => :requests
@@ -130,8 +133,19 @@ class User < ActiveRecord::Base
 
 	has_many :friend_requests, :class_name => 'Friendship', :foreign_key => 'friend_id', :conditions => {:status => 0}
 
+	# tags
+	has_many :friend_tags, :foreign_key => 'friend_id'
+
+	has_many :relative_blogs, :through => :friend_tags, :source => 'blog'
+
+	has_many :relative_videos, :through => :friend_tags, :source => 'video'
+
+	has_many :photo_tags, :foreign_key => 'tagged_user_id'
+
+	has_many :relative_photos, :through => 'photo_tags', :source => 'photo'
+
 	# feeds
-	has_many :feed_deliveries, :foreign_key => 'recipient_id', :order => 'created_at DESC'
+	has_many :feed_deliveries, :as => 'recipient', :order => 'created_at DESC'
 
 	has_many :feed_items, :through => :feed_deliveries, :order => 'created_at DESC'
 
@@ -169,7 +183,7 @@ class User < ActiveRecord::Base
 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :password, :password_confirmation, :qq, :mobile, :country, :city, :birthday, :gender
+  attr_accessible :login, :password, :password_confirmation, :gender, :invitations_count
 
   attr_reader :enabled
 

@@ -8,8 +8,9 @@ protected
 
   def catch_commentable
     @status = Status.find(params[:status_id])
-    @user = @status.user
+    @user = @status.poster
     @commentable = @status
+		@type = 'status'
   rescue
     not_found
   end 

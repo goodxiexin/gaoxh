@@ -9,7 +9,7 @@ class EventObserver < ActiveRecord::Observer
   end
 
   def after_create(event)
-    event.create_album
+    event.create_album(:title => "#{event.title}活动的相册", :privilege => 1, :game_id => event.game_id, :poster_id => event.poster_id)
     event.participations.create(:participant_id => event.poster_id, :status => 3)
   end
 

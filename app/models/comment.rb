@@ -10,8 +10,4 @@ class Comment < ActiveRecord::Base
 
   acts_as_emotion_text :columns => [:content]
 
-  named_scope :user_viewable, lambda { |user_id|
-    {:conditions => ["whisper = 0 OR poster_id = ? OR recipient_id = ?", user_id, user_id]}
-  }
-
 end

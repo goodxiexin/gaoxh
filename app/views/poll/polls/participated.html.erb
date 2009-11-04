@@ -1,23 +1,24 @@
-<% content_for :left do %>
-  <%= render :partial => '/app_menu' %>
-  <div class='blog-right-bar'>
-    <div class='part'>
-      <h3>投票分类: </h3>
-      <% game_options = [['全部', nil]] %>
-      <% @user.games.each {|g| game_options << [g.name, g.id] } %>
-      <%= select_tag '', options_for_select(game_options, params[:game_id].to_i), :onchange => "window.location.href = '#{participated_polls_url(:id => @user.id)}' + '&game_id=' + this.value;" %>
+<h1 class="big-ploy">活动</h1>
+<div class="box02 canvas_int">
+  <div class="tab tab01">
+    <% if @user == current_user %>
+    <div class="right">
+      <%= link_to "新建投票", new_poll_url %>
     </div>
+    <% end %>
+    <ul>
+      <li><span><%= link_to "热门投票", hot_polls_url(:id => @user.id) %></span></li>
+      <li><span><%= link_to "最近投票", recent_polls_url(:id => @user.id) %></span></li>
+      <li class='hover'><span><%= link_to "#{get_subject @user}的投票", polls_url(:id => @user.id) %></span></li>
+      <% if @user == current_user %>
+      <li><span><%= link_to "朋友的投票", poll_feeds_url(:id => @user.id) %></span></li>
+      <% end %>
+    </ul>
   </div>
-<% end %>
-  
-<div>
-<%= render :partial => 'poll/menu' %>
+	<%= link_to "我发起的", polls_url(:id => @user.id) %>
+  <%= link_to "我参加过的", participated_polls_url(:id => @user.id) %>
+  <div class="piclist-rows" id='polls'>
+    <%= render :partial => 'poll_item', :collection => @polls %>
+  </div>
 </div>
-
-
-<table>
-  <%= render :partial => 'poll_item', :collection => @polls %>
-</table>
-
-<%= will_paginate @polls %>
 

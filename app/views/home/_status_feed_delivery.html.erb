@@ -1,9 +1,84 @@
 <% delivery = status_feed_delivery %>
 <% status = delivery.feed_item.originator %>
-<div id='feed_delivery_<%= delivery.id %>'>
-	<div><%= avatar status.user %></div>
-	<div><%= profile_link status.user %>更新了状态</div>
-	<div><%= truncate status.content, 80 %></div>
+<div class="feed-list" id='delivery_<%= delivery.id %>'>
+	<div class="feed-icon icon-share"></div>
+  <p><%= profile_link status.poster %> <span>更新了状态</span> </p>
+	<div class="feed-pic s_clear">
+		<div class="img">
+			<%= avatar status.poster %> 
+    </div>
+    <div class="pics"> <%= status.content %> </div>
+		<p><%= ftime status.created_at %> <%= link_to_function "评论", "show_comment_form('status', #{status.id}, null)" %></p>
+  </div>
+	<div id='status_comments_<%= status.id %>'>
+	<% comments = status.comments %>
+	<% if status.comments_count >= 3 %>
+		<% c = status.comments.first %>
+		<div class="box04 word-box" id='comment_<%= c.id %>'>
+      <div class="img"><%= avatar c.poster, :size => :small %></div>
+      <div class="word">
+        <p><%= profile_link c.poster %> <span><%= ftime c.created_at %> -</span> <%= link_to_function '回复', "show_comment_form('status', #{status.id}, '#{c.poster.login}');" %></p>
+        <p><%= c.content %></p>
+      </div>
+      <div class='option'>
+        <% if c.whisper %>
+          <%= "w" %>
+        <% end %>
+        <% if status.poster == current_user || c.poster == current_user %>
+        <% end %>
+      </div>
+    </div>
+		<div class="box04 comment-box">
+			<%= link_to_function "显示更多#{status.comments_count}条评论", "show_more_comments('status', #{status.id}, this);" %>
+		</div>
+		<% c = status.comments.last %>
+		<div class="box04 word-box" id='comment_<%= c.id %>'>
+      <div class="img"><%= avatar c.poster, :size => :small %></div>
+      <div class="word">
+        <p><%= profile_link c.poster %> <span><%= ftime c.created_at %> -</span> <%= link_to_function '回复', "show_comment_form('status', #{status.id}, '#{c.poster.login}');" %></p>
+        <p><%= c.content %></p>
+      </div>
+      <div class='option'>
+        <% if c.whisper %>
+          <%= "w" %>
+        <% end %>
+        <% if status.poster == current_user || c.poster == current_user %>
+        <% end %>
+      </div>
+    </div>
+	<% else %>
+	<% status.comments.each do |c| %>
+		<div class="box04 word-box" id='comment_<%= c.id %>'>
+			<div class="img"><%= avatar c.poster, :size => :small %></div>
+			<div class="word">
+				<p><%= profile_link c.poster %> <span><%= ftime c.created_at %> -</span> <%= link_to_function '回复', "show_comment_form('status', #{status.id}, '#{c.poster.login}');" %></p>
+			  <p><%= c.content %></p>
+			</div>
+			<div class='option'>
+				<% if c.whisper %>
+					<%= "w" %>
+				<% end %>
+				<% if status.poster == current_user || c.poster == current_user %>
+				<% end %>
+			</div>
+		</div>
+	<% end %>
+	<% end %>
+	</div>
+	<div class="box04 comment-box">
+		<%= text_area_tag 'add-comment', '添加评论...', :id => "add_status_comment_#{status.id}", :class => "textarea txt-add-comment", :onclick => "show_comment_form('status', #{status.id}, null)" %>
+    <div class="formcontent" id='status_comment_<%= status.id %>' style="display:none">
+			<% form_remote_for :comment, :html => {:id => "status_comment_form_#{status.id}"} do |f| %>
+				<div class="rows">
+          <%= f.text_area 'content', :class => "textarea", :id => "status_comment_content_#{status.id}" %>
+        </div>
+        <div class="rows s_clear">
+					<span class="button"><span><button type="button" onclick="submit_comment('status', <%= status.id %>)">发表</button></span></span>
+          <span class="button button-gray"><span><button type="button" onclick="hide_comment_form('status', <%= status.id %>)" >取消</button></span></span>
+					<%= emotion_link "status_comment_content_#{status.id}" %>
+        </div>
+			<% end %>
+		</div>
+  </div>
 	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
-	<div><%= ftime delivery.created_at %></div>
 </div>

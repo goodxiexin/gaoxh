@@ -9,12 +9,9 @@ class PhotoTagsController < ApplicationController
   before_filter :owner_required, :only => [:destroy]
 
   def create
-    if @tag = PhotoTag.create(params[:tag].merge({:poster_id => current_user.id})
-      render :update do |page|
-        page.insert_html :bottom, 'photo_tags', :partial => 'base/photo_tags/tag', :object => @tag
-        page << "photo_tag.after_submit_tag();"
-      end
-    else
+    if @tag = @photo.tags.create(params[:tag].merge({:poster_id => current_user.id}))
+			render :partial => "photo_tags/tag", :object => @tag
+		else
       render :update do |page|
         page << "alert('错误，稍后再试');"
       end
@@ -23,11 +20,7 @@ class PhotoTagsController < ApplicationController
 
   def destroy
     if @tag.destroy
-      render :update do |page|
-        page << "$('tag_#{@tag.id}').remove(); "
-        page << "if($('name_#{@tag.id}')) $('name_#{@tag.id}').remove();"
-        page << "if($('square_#{@tag.id}')) $('square_#{@tag.id}').remove();"
-      end
+			render :nothing => true
     else
       render :update do |page|
         page << "alert('错误，稍后再试');"
@@ -36,9 +29,15 @@ class PhotoTagsController < ApplicationController
   end
 
   def friends
-    @friends = current_user.friends
+    @friends = current_user.friends.find_all {|f| f.login.include? params[:tag][:tagged_user]}
     render :partial => 'friends', :object => @friends
   end
+
+	def all_friends
+		@friends = current_user.friends
+		render :partial => 'all_friends', :object => @friends
+	end
+	
 
 protected
 
@@ -46,10 +45,9 @@ protected
   end
 
   def catch_tag
-    @tag = @resource.tags.find(params[:id])
+    @tag = @photo.tags.find(params[:id])
   rescue
     not_found
   end
-
 
 end

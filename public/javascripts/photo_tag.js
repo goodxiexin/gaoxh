@@ -1,844 +1,218 @@
 PhotoTagBuilder = Class.create({
 
-  /*
-   * initialize
-   */
-  initialize: function(photo_id, user_id, types, options){
-    this.user_id = user_id;
-    this.photo_id = photo_id;
-    this.photo = $('photo_' + this.photo_id);
-    this.pos = this.photo.positionedOffset();
-    this.types = types;
-    this.complete_panel = $('complete_panel');
-    this.tags_area = $('photo_tags');
-    this.options = Object.extend({
-        square_size: '15%',
-	square_class: 'square-class',
-	tag_input_class: 'tag-input',
-	tag_class: 'tag_class',
-        friends_list_class: 'friends_list_class',
-	lang: {  // name for two buttons
-		add: 'Add',
-		close: 'Close'
-	},
-    }, options || {});
-
-    // calculate square size
-    this.square_size = this.photo.getWidth() * this.options.square_size.sub('%', '', 1)/100;
-
-    this.friends = [];
-    
-    // set window resize handler
-    // reset photo position if resize event happens
-    Event.observe(document.onresize? document : window, 'resize', function(){
+	initialize: function(type, photo_id){
+		this.photo_id = photo_id;
+		this.photo = $('photo_' + photo_id);
+		this.type = type;
+		this.pos = this.photo.positionedOffset();
+		this.square_size = this.photo.getWidth() * 15 /100;
+		Event.observe(document.onresize? document : window, 'resize', function(){
       this.pos = this.photo.positionedOffset();
     }.bind(this));
+		this.square;
+		this.input;
+		this.current_tag_id;
+		// load all tags
+		var tags = $('photo_tags').childElements();
+		this.tags = new Hash();
+		for(var i=0;i<tags.length;i++){
+			this.tags.set(parseInt(tags[i].readAttribute('tag_id')), tags[i]);
+		}
+		this.photo.observe('mousemove', function(e){
+			this.show_nearest_tag_with_info(e);
+		}.bind(this));
+	},
 
-    // get all current tags
-    this.ptags = new Hash();
-    var ptags = $('photo_tags').childElements();
-    var length = ptags.length;
-    for(var i=0;i<length;i++){
-      this.ptags.set(ptags[i].readAttribute('tag_id'), ptags[i]);
-    } 
+	start: function(){
+		if(!this.square && !this.input){
+			this.create_square();
+			this.create_input();
+		}
+		this.show_square();
+		this.show_input();
+		this.photo.stopObserving('mousemove'); 
+	},
 
-    // set photo mouseover event
-    this.photo.observe('mousemove', function(event){
-      this.show_nearest_tag_with_name(event);
-    }.bind(this));
-  },
-
-  /*
-   * init: begin tagging
-   */
-  init: function(){
-    // show complete panel
-    this.complete_panel.show(); 
-
-    // I dont know if this field is needed,
-    // because sometimes mouse up event would happen two times( i dont know why)
-    // this would cause "new draggable()" called twice
-    this.draggable_count = 0;
-
-    // if square and tag input exist, we dont need to create them
-    // just hide them
-    if(this.square && this.tag_input){
-      this.hide_square();
-      this.hide_tag_input();
-    }else{
-      // create square and input box
-      this.create_square();   
-      this.create_tag_input();
-    } 
-
-    // stop listening to mousemove event on photo
-    this.photo.stopObserving('mousemove');
-
-    // add onClick event to photo
-    Event.observe(this.photo, 'click', function(event){
-      this.set_square(event);
-    }.bind(this));
-  },
-
-  /*
-   * create square
-   * this function just creates square element but doesn't set its position
-   */
-  create_square: function(){
-    // create square
-    this.square = new Element('div', {className: this.options.square_class});
-
-    // set square style
-    this.square.setStyle({
-	position: 'absolute',
-	left: '0px',
-	top: '0px',
-	height: this.square_size + 'px',
-	width: this.square_size + 'px'}); 
-
-    this.create_leftup_corner();
-    this.create_leftdown_corner();
-    this.create_rightup_corner();
-    this.create_rightdown_corner();
-
-    this.hide_square();
-    document.body.appendChild(this.square);
-  },
-
-  /*
-   * create leftup corner of square
-   * this function just creates square element but doesn't set its position
-   */
-  create_leftup_corner: function(){
-    // create div element
-    this.leftup_corner = new Element('div', {id: 'leftup-corner'});
-    this.square.appendChild(this.leftup_corner);
-
-    // set mouse over listener to change cursor icon
-    this.leftup_corner.observe('mouseover', function(event){
-      document.body.setStyle({cursor: 'nw-resize'});
-    });
-
-    // set mouse out listener to change cursor icon to default one
-    this.leftup_corner.observe('mouseout', function(event){
-      document.body.setStyle({cursor: 'default'});
-    });
-
-    // set mouse down listener to start resize
-    this.leftup_corner.observe('mousedown', function(event){
-      // save original position and size
-      this.start_x = event.pointerX();
-      this.start_y = event.pointerY();
-      this.original_height = this.square.getHeight();
-      this.original_width = this.square.getWidth();
-
-      // disable dragging while resizing
-      this.disable_drag();
-
-      // start listening for mouse move event
-      document.body.observe('mousemove', function(event){
-        var width = this.square.getWidth();
-        var height = this.square.getHeight();
-
-        // recording end position and make sure that it stays in photo
-        var xy = this.stay_in_photo(event.pointerX(), event.pointerY());
-        var x = xy[0];
-        var y = xy[1];
-
-        // resize square
-        this.square.setStyle({
-          left: x + 'px',
-          top: y + 'px',
-          width: (this.original_width + this.start_x - x) + 'px',
-          height: (this.original_height + this.start_y - y) + 'px',
-        });
-
-         // reset positions of 4 corners
-         this.set_corners();
-
-         // reset position of tag input
-         this.set_tag_input();
-      }.bind(this));
-      document.body.observe('mouseup', function(event){
-        this.enable_drag();
-        Event.stopObserving(document.body, 'mousemove');
-        Event.stopObserving(document.body, 'mouseup');
-      }.bind(this));
-    }.bind(this));
-  },
-
-  /*
-   * create leftdown corner of square
-   * this function just creates square element but doesn't set its position
-   */
-  create_leftdown_corner: function(){
-    // create div element
-    this.leftdown_corner = new Element('div', {id: 'leftdown-corner'});
-    this.square.appendChild(this.leftdown_corner);
-
-    // set mouse over listener to change cursor icon
-    this.leftdown_corner.observe('mouseover', function(event){
-      document.body.setStyle({cursor: 'sw-resize'});
-    });
-
-    // set mouse out listener to change cursor icon to default one
-    this.leftdown_corner.observe('mouseout', function(event){
-      document.body.setStyle({cursor: 'default'});
-    });
-
-    // set mouse down listener to start resize
-    this.leftdown_corner.observe('mousedown', function(event){
-      // save original position and size
-      this.start_x = event.pointerX();
-      this.start_y = event.pointerY();
-      this.original_height = this.square.getHeight();
-      this.original_width = this.square.getWidth();
-
-      // disable dragging while resizing
-      this.disable_drag();
-
-      // start listening for mouse move event
-      document.body.observe('mousemove', function(event){
-        var width = this.square.getWidth();
-        var height = this.square.getHeight();
-
-        // recording end position and make sure that it stays in photo
-        var xy = this.stay_in_photo(event.pointerX(), event.pointerY() - height);
-        var x = xy[0];
-        var y = xy[1] + height;;
-
-        // resize square
-        this.square.setStyle({
-          left: x + 'px',
-          width: (this.original_width + this.start_x - x) + 'px',
-          height: (this.original_height + y - this.start_y) + 'px',
-        });
-
-         // reset positions of 4 corners
-         this.set_corners();
-
-         // reset position of tag input
-         this.set_tag_input();
-      }.bind(this));
-      document.body.observe('mouseup', function(event){
-        this.enable_drag();
-        Event.stopObserving(document.body, 'mousemove');
-        Event.stopObserving(document.body, 'mouseup');
-      }.bind(this));
-    }.bind(this));
-  },
-
-  /*
-   * create rightup corner of square
-   * this function just creates square element but doesn't set its position
-   */
-  create_rightup_corner: function(){
-    // create div element
-    this.rightup_corner = new Element('div', {id: 'rightup-corner'});
-    this.square.appendChild(this.rightup_corner);
-
-    // set mouse over listener to change cursor icon
-    this.rightup_corner.observe('mouseover', function(event){
-      document.body.setStyle({cursor: 'ne-resize'});
-    });
-
-    // set mouse out listener to change cursor icon to default one
-    this.rightup_corner.observe('mouseout', function(event){
-      document.body.setStyle({cursor: 'default'});
-    });
-
-    // set mouse down listener to start resize
-    this.rightup_corner.observe('mousedown', function(event){
-      // save original position and size
-      this.start_x = event.pointerX();
-      this.start_y = event.pointerY();
-      this.original_height = this.square.getHeight();
-      this.original_width = this.square.getWidth();
-
-      // disable dragging while resizing
-      this.disable_drag();
-
-      // start listening for mouse move event
-      document.body.observe('mousemove', function(event){
-        var width = this.square.getWidth();
-        var height = this.square.getHeight();
-
-        // recording end position and make sure that it stays in photo
-        var xy = this.stay_in_photo(event.pointerX() - width, event.pointerY());
-        var x = xy[0] + width;
-        var y = xy[1];
-
-        // resize square
-        this.square.setStyle({
-          top: y + 'px',
-          width: (this.original_width + x - this.start_x) + 'px',
-          height: (this.original_height + this.start_y - y) + 'px',
-        });
-
-         // reset positions of 4 corners
-         this.set_corners();
-
-         // reset position of tag input
-         this.set_tag_input();
-      }.bind(this));
-      document.body.observe('mouseup', function(event){
-        this.enable_drag();
-        Event.stopObserving(document.body, 'mousemove');
-        Event.stopObserving(document.body, 'mouseup');
-      }.bind(this));
-    }.bind(this));
-  },
-
-  /*
-   * create rightdown corner of square
-   * this function just creates square element but doesn't set its position
-   */
-  create_rightdown_corner: function(){
-    // create div element
-    this.rightdown_corner = new Element('div', {id: 'rightdown-corner'});
-    this.square.appendChild(this.rightdown_corner);
-
-    // set mouse over listener to change cursor icon
-    this.rightdown_corner.observe('mouseover', function(event){
-      document.body.setStyle({cursor: 'se-resize'});
-    });
-
-    // set mouse out listener to change cursor icon to default one
-    this.rightdown_corner.observe('mouseout', function(event){
-      document.body.setStyle({cursor: 'default'});
-    });
-
-    // set mouse down listener to start resize
-    this.rightdown_corner.observe('mousedown', function(event){
-      // save original position and size
-      this.start_x = event.pointerX();
-      this.start_y = event.pointerY();
-      this.original_height = this.square.getHeight();
-      this.original_width = this.square.getWidth();
-
-      // disable dragging while resizing
-      this.disable_drag();
-
-      // start listening for mouse move event
-      document.body.observe('mousemove', function(event){
-        var width = this.square.getWidth();
-        var height = this.square.getHeight();
-
-        // recording end position and make sure that it stays in photo
-        var xy = this.stay_in_photo(event.pointerX() - width, event.pointerY() - height);
-        var x = xy[0] + width;
-        var y = xy[1] + height;
-
-        // resize square
-        this.square.setStyle({
-          width: (this.original_width + x - this.start_x) + 'px',
-          height: (this.original_height + y - this.start_y) + 'px',
-        });
-
-         // reset positions of 4 corners
-         this.set_corners();
-
-         // reset position of tag input
-         this.set_tag_input();
-      }.bind(this));
-      document.body.observe('mouseup', function(event){
-        this.enable_drag();
-        Event.stopObserving(document.body, 'mousemove');
-        Event.stopObserving(document.body, 'mouseup');
-      }.bind(this));
-    }.bind(this));
-  },
-
-  /*
-   * hide square
-   */
-  hide_square: function(){
-    this.square.hide();
-  },
-
-  /*
-   * show square
-   */
-  show_square: function(){
-    this.square.show();
-  },
-
-  /*
-   * hide tag input
-   */
-  hide_tag_input: function(){
-    this.inner_textfield.value = '';
-    this.tag_input.hide();
-  },
-
-  /*
-   * show tag input
-   */
-  show_tag_input: function(){
-    this.tag_input.show();
-    this.inner_textfield.focus();
-  },
-
-  /*
-   * this function guarantees that the square stays in photo area
-   * take care when invoking this function: (x, y) is (left, top) of square
-   * thus do the convertion before invoking this function
-   */
-  stay_in_photo: function(x, y){
-    // lb: left bound, rb: right bound, ub: upper bound, bb: lower bound
-    var lb = this.pos.left - this.square.getWidth()/2;
-    var rb = this.pos.left + this.photo.getWidth() - this.square.getWidth()/2;
-    var ub = this.pos.top - this.square.getHeight()/2;
-    var bb = this.pos.top + this.photo.getHeight() - this.square.getHeight()/2;
-
-    // make sure the square stays in photo area
-    if(x < lb)
-      x = lb;
-    if(x > rb)
-      x = rb;
-    if(y < ub)
-      y = ub;  
-    if(y > bb)
-      y = bb;
-
+	stay_in_photo: function(x, y){
+    if(x < this.pos.left)
+      x = this.pos.left;
+    if(x > this.pos.left + this.photo.getWidth() - this.square_size)
+      x = this.pos.left + this.photo.getWidth() - this.square_size;
+    if(y < this.pos.top)
+      y = this.pos.top;
+    if(y > this.pos.top + this.photo.getHeight() - this.square_size)
+      y = this.pos.top + this.photo.getHeight() - this.square_size;
     return [x,y];
   },
 
-  /*
-   * enable draggable
-   */
   enable_drag: function(){
-    // if there is no draggable object
-    if(this.draggable_count == 0){
-      this.draggable_count += 1;
-      this.draggable = new Draggable(this.square, {
-        snap: function(x, y, draggable){
-          var xy = this.stay_in_photo(x, y);
-          this.square.setStyle({
-            left: xy[0] + 'px',
-            top: xy[1] + 'px'
-          });
-          this.set_tag_input();
-          return xy;
-        }.bind(this)
-      });
-    }
-  },
-
-  /*
-   * disable draggable
-   */
-  disable_drag: function(){
-    // if there is one draggable object
-    if(this.draggable_count == 1){
-      this.draggable.destroy();
-      this.draggable_count -= 1;
-    }
-  },
-
-  /*
-   * create tag input but not show it
-   * this function just creates tag input but doesn't set its position
-   * html code looks like:
-   * <div>
-   *   <div> hidden text field which stores tagged user id </div>
-   *   <div>
-   *     Input your friend: <br/>
-   *     <text_field>
-   *   </div>
-   *   <div> friend list </div>
-   *   <div> 2 buttons </div>
-   * </div>
-   */
-  create_tag_input: function(){
-    // create tag input
-    this.tag_input = new Element('div', {className: this.options.tag_input_class});
-    this.tag_input_hidden = new Element('div');
-    this.hidden_textfield = new Element('input', {type: 'text', id: 'tagged_user_id'});
-    this.tag_input_top = new Element('div');
-    this.label = new Element('label').update('Input your friend here:<br/>'); 
-    this.inner_textfield = new Element('input', {type: 'text', id: 'tagged_user_name'});
-    this.friend_list = new Element('div');
-    this.tag_input_bot = new Element('div');
-    this.cancel_button = new Element('button').update('cancel');
-
-    this.tag_input_hidden.appendChild(this.hidden_textfield);
-    this.tag_input_top.appendChild(this.label);
-    this.tag_input_top.appendChild(this.inner_textfield);
-    this.tag_input_bot.appendChild(this.cancel_button);
-    this.tag_input.appendChild(this.tag_input_hidden);
-    this.tag_input.appendChild(this.tag_input_top);
-    this.tag_input.appendChild(this.friend_list);
-    this.tag_input.appendChild(this.tag_input_bot);
-
-    this.tag_input_hidden.hide();
-    this.friend_list.setStyle({
-      height: '200px',
-      overflow: 'auto'
-    });
-   
-    this.tag_input_top.setStyle({
-      margin: '10px'
-    });
-
-    this.tag_input_bot.setStyle({
-      margin: '10px',
-      align: 'center'
-    });
-
-    this.tag_input.setStyle({
-      background: 'white'
-    });
- 
-    // get all friends
-    this.get_friends();
-
-    // set button events
-    this.set_button_events();
-
-    // set text field observer
-    this.set_textfield_observer();
-
-    // hide the element and add it to document.body
-    // hide_tag_input() should be invoked after tag_input.inner_textfield is created
-    this.hide_tag_input();
-    document.body.appendChild(this.tag_input);
-  },
-
-  get_selected_friend_id: function(){
-    var length = this.friends.length;
-    for(var i=0;i<length;i++){
-      var friend = this.friends[i];
-      var checkbox = friend.childElements()[0];
-      if(checkbox.checked){
-        checkbox.checked = false;
-        return friend.readAttribute('id');
-      }
-    }
-  },
-
-  /*
-   * get all friends
-   */
-  get_friends: function(){
-    new Ajax.Request('/base/photo_stags/friends', {
-      method: 'get',
-      onSuccess: function(transport){
-        this.friend_list.innerHTML = transport.responseText;
-        var friends = this.friend_list.childElements();
-        var length = friends.length;
-        for(var i=0;i<length;i++){
-          var checkbox = friends[i].childElements()[0];
-          checkbox.observe('click', function(event){
-            var id = this.get_selected_friend_id();
-            this.submit_tag(id);
-          }.bind(this));
-          this.friends.push(friends[i]);
-        }
+    this.draggable = new Draggable(this.square, {
+      snap: function(x, y, draggable){
+        var xy = this.stay_in_photo(x, y);
+        this.square.setStyle({
+          left: xy[0] + 'px',
+          top: xy[1] + 'px'
+        });
+        this.locate_input();
+        return xy;
       }.bind(this)
     });
   },
 
-  /*
-   * set textfield observer
-   */
-  set_textfield_observer: function(){
-    new Form.Element.Observer(this.inner_textfield, 1, function(element, value){
-      var length = this.friends.length;
-      for(var i=0;i<length;i++){
-        friend = this.friends[i];
-        if(friend.readAttribute('name').indexOf(value) < 0){
-          friend.hide();
-        }else{
-          friend.show();
-        }
-      } 
-    }.bind(this)); 
-  },
-
-  /*
-   * set add/close button events
-   */
-  set_button_events: function(){
-    this.cancel_button.observe('click', function(event){
-      this.hide_square();
-      this.hide_tag_input();
-    }.bind(this)); 
-  },
-
-  /*
-   * submit tag
-   */
-  submit_tag: function(tagged_user_id){
-    // get square position
-    var left = this.square.positionedOffset().left;
-    var top = this.square.positionedOffset().top;
-    
-    // construct parameters
-    url = '/' + this.types + '/' + this.photo_id + '/tags?' + 
-          'tag[x]=' + (left - this.pos.left) + '&' +
-          'tag[y]=' + (top - this.pos.top) + '&' +
-          'tag[width]=' + this.square.getWidth() + '&' +
-          'tag[height]=' + this.square.getHeight() + '&' +
-          'tag[tagged_user_id]=' + tagged_user_id + '&' +
-          'tag[photo_id]=' + this.photo_id + '&';
-    // send ajax request to store photo tag
-    new Ajax.Request(url, {method: 'post'});
-  },
-
-  after_submit_tag: function(){
-    this.hide_square();
-    this.hide_tag_input();
-    var ptags = this.tags_area.childElements();
-    var length = ptags.length;
-    for(var i=0;i<length;i++){
-      this.ptags.set(ptags[i].readAttribute('tag_id'), ptags[i])
-    }
-  },
-
-  /*
-   * set the location of square
-   */
-  set_square: function(event){
-    // get mouse location
-    var mouse_x = event.pointerX();
-    var mouse_y = event.pointerY();
-
-    // calculate square location
-    var square_top = mouse_y - this.square_size/2;
-    var square_left = mouse_x - this.square_size/2;
-
-    // pay attention to the orders
-    // first set square position, then 4 corners and tag input
-
-    // set square location and show it
+	create_square: function(){
+		this.square = $('square');
     this.square.setStyle({
-	position: 'absolute',
-	width: this.square_size + 'px',
-	height: this.square_size + 'px',
-	top: square_top + 'px',
-	left: square_left + 'px',
-	zIndex: 4});
-  
-    // show square
-    this.show_square();
+      position: 'absolute',
+      left: this.pos.left + 'px',
+      top: this.pos.top + 'px',
+      border: '2px solid #eeeeee',
+      height: this.square_size + 'px',
+      width: this.square_size + 'px',
+      zIndex: 4});
+		this.enable_drag();
+	},
 
-    // set 4 corners
-    this.set_corners();
+	show_square: function(){
+		this.square.show();
+	},
 
-    // set tag input
-    this.set_tag_input();
+	hide_square: function(){
+		this.square.hide();
+	},
 
-    // enable draggable
-    this.enable_drag();
-  },
+	create_input: function(){
+	  this.input = $('input');
+    this.tagged_user_id = $('tag_tagged_user_id');
+    this.cancel_btn = $('cancel_btn');
+    this.confirm_btn = $('confirm_btn');
+		this.autocomplete = $('tag_tagged_user');
+		this.content = $('tag_content');
+    this.cancel_btn.observe('click', function(){
+      this.hide_input();
+      this.hide_square();
+			this.photo.observe('mousemove', function(e){
+				this.show_nearest_tag_with_info(e);
+			}.bind(this));
+    }.bind(this));
+    this.confirm_btn.observe('click', function(){
+      this.submit_tag();
+    }.bind(this));
+	},
 
-  /*
-   * set positions of 4 corners
-   */
-  set_corners: function(){
-    // get x, y, width, height of square and corner size
-    var width = this.square.getWidth();
-    var height = this.square.getHeight();
-    var corner_size = 10;
+	show_input: function(){
+		this.locate_input();
+		this.input.show();
+	},
 
-    // set position of 4 corners
-    this.leftup_corner.setStyle({
-        position: 'absolute',
-        backgroundColor: '#000',
-        left: '0px',
-        top: '0px',
-        width: corner_size + 'px',
-        height: corner_size + 'px',
-        zIndex: 4});
-    this.leftdown_corner.setStyle({
-        position: 'absolute',
-        backgroundColor: '#000',
-        left: '0px',
-        top: (height - corner_size) + 'px',
-        width: corner_size + 'px',
-        height: corner_size + 'px',
-        zIndex: 4});
-    this.rightup_corner.setStyle({
-        position: 'absolute',
-        backgroundColor: '#000',
-        left: (width - corner_size) + 'px',
-        top: '0px',
-        width: corner_size + 'px',
-        height: corner_size + 'px',
-        zIndex: 4});
-    this.rightdown_corner.setStyle({
-        position: 'absolute',
-        backgroundColor: '#000',
-        left: (width - corner_size) + 'px',
-        top: (height - corner_size) + 'px',
-        width: corner_size + 'px',
-        height: corner_size + 'px',
-        zIndex: 4});
-  },
+	hide_input: function(){
+		this.input.hide();
+	},	
 
-  /*
-   * show tag input according to the position of square
-   */
-  set_tag_input: function(event){
-    // calculate the position of tag input
+	locate_input: function(){
     var top = this.square.positionedOffset().top;
     var left = this.square.positionedOffset().left + this.square.getWidth() + 10;
+    this.input.setStyle({position: 'absolute', top: top + 'px', left: left + 'px', zIndex: 4});
+	},
 
-    // set style
-    this.tag_input.setStyle({
-	position: 'absolute',
-	top: top + 'px',
-        left: left + 'px',
-        zIndex: 4});
+	after_select_friend: function(name, friend_id){
+		this.tagged_user_id.value = friend_id;
+		this.autocomplete.value = name;alert(name);
+		if(this.friend_list){
+			this.friend_list.hide();
+			$('radio_' + this.tagged_user_id.value).checked = false;
+		}
+	},
 
-    // show tag input and set the focus of inner text field
-    this.show_tag_input();
-  },
+	validate_tag: function(){
+		if(this.tagged_user_id.value == ''){
+			error('请选择一个好友');
+			return false;
+		}
+		return true;
+	},
 
-  /*
-   * delete one tag
-   */
-  delete: function(tag_id){
-    if(!this.ptags.unset(tag_id)) return;
-    new Ajax.Request('/' + this.types + '/' + this.photo_id + '/tags/' + tag_id, {method: 'delete'});
-  },
+	toggle_friends: function(token){
+		if(this.friend_list){
+			this.friend_list.toggle();
+		}else{
+			this.friend_list = new Element('div');
+			this.input.appendChild(this.friend_list);
+			alert(this.autocomplete.positionedOffset());
+			this.friend_list.setStyle({
+				position: 'absolute',
+				left: (this.autocomplete.positionedOffset().left + this.autocomplete.getWidth() - 250) + 'px',
+				top: (this.autocomplete.positionedOffset().top + 25) + 'px',
+				width: '250px',
+				height: '200px',
+				overflow: 'auto',
+				border: '1px solid black',
+				background: 'white'
+			});
+			this.friend_list.innerHTML = '<img src="/images/loading.gif" />';
+			new Ajax.Request('/photo_tags/all_friends', {
+				method: 'get',
+				parameters: 'authenticity_token=' + encodeURIComponent(token),
+				onSuccess: function(transport){
+					this.friend_list.innerHTML = transport.responseText;
+				}.bind(this)
+			});
+		}
+	},
 
-  /*
-   * hide one tag
-   */
-  hide_tag: function(tag_id){
-    var square = $('square_' + tag_id);
-    if(square)  square.hide();
-  },
+	submit_tag: function(){
+		if(this.validate_tag()){
+			var params = "";
+			params = $('tag_form').serialize();
+			params += "&tag[x]=" + (this.square.positionedOffset().left - this.pos.left);
+			params += "&tag[y]=" + (this.square.positionedOffset().top - this.pos.top);
+			params += "&tag[width]=" + this.square.getWidth();
+			params += "&tag[height]=" + this.square.getHeight();
+			alert('/' + this.type + 's/' + this.photo_id + '/tags');
+			new Ajax.Request('/' + this.type + 's/' + this.photo_id + '/tags', {
+				method: 'post', 
+				parameters: params,
+				onSuccess: function(transport){
+					this.autocomplete.clear();
+					this.tagged_user_id.clear();
+					this.content.clear();
+					var tag = new Element('div');
+					tag.innerHTML = transport.responseText;
+					this.tags.set(tag.childElements()[0].readAttribute('tag_id'), tag.childElements()[0]);
+					Element.insert($('photo_tags'), {bottom: tag.innerHTML});
+				}.bind(this)
+			});
+		}
+	},
 
-  /*
-   * hide tag with name
-   */
-  hide_tag_with_name: function(tag_id){
-    var square = $('square_' + tag_id);
-    var name = $('name_' + tag_id);
-    if(square) square.hide();
-    if(name) name.hide();
-  },
+	remove_tag: function(tag_id, authenticity_token){
+		new Ajax.Request('/' + this.type + 's/' + this.photo_id + '/tags/' + tag_id, {
+			method: 'delete',
+			parameters: 'authenticity_token=' + encodeURIComponent(authenticity_token),
+			onSuccess: function(transport){
+				if($('square_'+tag_id)) $('square_'+tag_id).remove();
+				if($('info_'+tag_id)) $('info_'+tag_id).remove();
+				var tag = this.tags.unset(tag_id);
+				if(tag) tag.remove();
+			}.bind(this)
+		});
+	},
 
-  /*
-   * show one tag
-   */
-  show_tag: function(tag_id){
-    var square = $('square_'+tag_id);
-    // if it's first time we visit this tag, create a new square
-    // otherwise, just show the old square
-    if(square){
-      square.show();
-      return;
-    }
-
-    // calculate x, y, width, height
-    // here, we just save these values as element attributes
-    // rather than connect server
-    var ptag = this.ptags.get(tag_id);
-    if(!ptag) return;
-    var x = ptag.readAttribute('x');
-    var y = ptag.readAttribute('y');
-    var width = ptag.readAttribute('width');
-    var height = ptag.readAttribute('height');
-    var top = parseInt(y) + this.pos.top;
-    var left = parseInt(x) + this.pos.left;
-    // create new square
-    square = new Element('div', {className: 'square-class', id: 'square_' + tag_id});
-    
-    // set square style
-    square.setStyle({
-	position: 'absolute',
-        width: width + 'px',
-        height: height + 'px',
-        left: left + 'px',
-        top: top + 'px',
-        zIndex: 3});
-
-    // append square
-    document.body.appendChild(square);
-  
-  },
-
-  /*
-   * show tag with name next to it
-   */
-  show_tag_with_name: function(tag_id){
-    var ptag = this.ptags.get(tag_id);
-    if(!ptag) return;    
-
-    var square = $('square_'+tag_id);
-    
-    if(square){
-      square.show();
-    }else{
-      // calculate x, y, width, height
-      // here, we just save these values as element attributes
-      // rather than connect server
-      var x = ptag.readAttribute('x');
-      var y = ptag.readAttribute('y');
-      var width = ptag.readAttribute('width');
-      var height = ptag.readAttribute('height');
-      var top = parseInt(y) + this.pos.top;
-      var left = parseInt(x) + this.pos.left;
-      
-      // create new square
-      square = new Element('div', {className: 'square-class', id: 'square_' + tag_id});
-      square.setStyle({
-        position: 'absolute',
-        width: width + 'px',
-        height: height + 'px',
-        left: left + 'px',
-        top: top + 'px',
-        zIndex: 3});
-
-      // append square
-      document.body.appendChild(square);
-    }
-
-    var name = $('name_' + tag_id);
-
-    if(name){
-      name.show();
-    }else{
-      var left = parseInt(ptag.readAttribute('x')) + parseInt(ptag.readAttribute('width')) + this.pos.left + 10;
-      var top = parseInt(ptag.readAttribute('y')) + this.pos.top;
-      
-      // create new element
-      name = new Element('div', {id: 'name_' + tag_id}).update(ptag.readAttribute('name'));
-      name.setStyle({
-        position: 'absolute',
-        color: 'white',
-        background: 'black',
-        left: left + 'px',
-        top: top + 'px',
-        zIndex: 3});
-      document.body.appendChild(name); 
-    }
-  
-  },
-
-  /*
-   * show nearest tag with name 
-   */ 
-  show_nearest_tag_with_name: function(event){
-    var distance = 100000000;
+	show_nearest_tag_with_info: function(event){
+		var distance = 100000000;
     var tag_id = -1;
     var photo_x = this.pos.left;
     var photo_y = this.pos.top;
     var mouse_x = event.pointerX();
     var mouse_y = event.pointerY();
 
-    this.ptags.each(function(pair){
+    this.tags.each(function(pair){
       var x = photo_x + parseInt(pair.value.readAttribute('x'));
       var width = parseInt(pair.value.readAttribute('width'));
       var y = photo_y + parseInt(pair.value.readAttribute('y'));
       var height = parseInt(pair.value.readAttribute('height'));
       if(mouse_x >= x && mouse_x <= x + width && mouse_y >=y && mouse_y <= y + height){
-        var delta_x = (x + width/2) - mouse_x; //alert(delta_x);
-        var delta_y = (y + height/2) - mouse_y; //alert(delta_y);
+        var delta_x = (x + width/2) - mouse_x; 
+        var delta_y = (y + height/2) - mouse_y; 
         var delta = ((x + width/2) - mouse_x) * ((x + width/2) - mouse_x) + ((y + height/2) - mouse_y) * ((y + height/2) - mouse_y);
         if(delta < distance){
           distance = delta;
@@ -846,36 +220,69 @@ PhotoTagBuilder = Class.create({
         }
       }else{
         if(pair.key == this.current_tag_id){
-          this.hide_tag_with_name(this.current_tag_id);
+          this.hide_tag_with_info(this.current_tag_id);
           this.current_tag_id = -1;
         }
       }
     }.bind(this));
-    
+
     if(tag_id >= 0){
       this.current_tag_id = tag_id;
-      this.show_tag_with_name(tag_id);
+      this.show_tag_with_info(tag_id);
     }
+	},
+
+  hide_tag_with_info: function(tag_id){
+    var square = $('square_' + tag_id);
+    var info = $('info_' + tag_id);
+    if(square) square.hide();
+    if(info) info.hide();
   },
 
-  /*
-   * complete tagging
-   */
-  complete: function(){
-    // hide complete panel
-    this.complete_panel.hide();
+	show_tag_with_info: function(tag_id){
+		var tag = this.tags.get(tag_id);
+    if(!tag) return;
+    var square = $('square_'+tag_id);
+    if(square){
+      square.show();
+    }else{
+      var x = tag.readAttribute('x');
+      var y = tag.readAttribute('y');
+      var width = tag.readAttribute('width');
+      var height = tag.readAttribute('height');
+      var top = parseInt(y) + this.pos.top;
+      var left = parseInt(x) + this.pos.left;
+      square = new Element('div', {className: 'square-class', id: 'square_' + tag_id});
+      square.setStyle({
+        position: 'absolute',
+        width: width + 'px',
+        height: height + 'px',
+        left: left + 'px',
+        top: top + 'px',
+				border: '2px solid #eeeeee',
+        zIndex: 4});
+      document.body.appendChild(square);
+    }
+    var info = $('info_' + tag_id);
+		if(info){
+      info.show();
+    }else{
+      var left = parseInt(tag.readAttribute('x')) + parseInt(tag.readAttribute('width')) + this.pos.left + 10;
+      var top = parseInt(tag.readAttribute('y')) + this.pos.top;
+      info = new Element('div', {id: 'info_' + tag_id}).update(tag.readAttribute('info'));
+      info.setStyle({
+        position: 'absolute',
+        color: 'white',
+        background: 'black',
+        left: left + 'px',
+        top: top + 'px',
+        zIndex: 4});
+      document.body.appendChild(info);
+    }
+	}
 
-    // hide square and tag input
-    this.hide_square();
-    this.hide_tag_input();
-
-    // stop listening for photo click event
-    this.photo.stopObserving('click');
-
-    // start listening for mousemove event
-    this.photo.observe('mousemove', function(event){
-      this.show_nearest_tag_with_name(event);
-    }.bind(this));
-  }
 });
 
+function select_friend(textfield, selected_li){
+	tag_builder.after_select_friend(textfield.value, selected_li.readAttribute('id'));
+}

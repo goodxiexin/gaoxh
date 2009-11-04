@@ -35,7 +35,7 @@ class Status::StatusesController < ApplicationController
   def destroy
     @status.destroy
     render :update do |page|
-      page << "alert('成功');$('status_#{@status.id}').remove();"
+      page << "facebox.close();$('status_#{@status.id}').remove();"
     end
   end
 

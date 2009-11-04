@@ -2,6 +2,7 @@ class CreatePhotoTags < ActiveRecord::Migration
   def self.up
     create_table :photo_tags do |t|
       t.integer :poster_id
+			t.integer :photo_id
       t.integer :tagged_user_id
       t.integer :taggable_id
 			t.string	:taggable_type

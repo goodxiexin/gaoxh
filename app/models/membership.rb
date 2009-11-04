@@ -6,8 +6,8 @@ class Membership < ActiveRecord::Base
 
 	has_many :feed_items, :as => 'originator', :dependent => :destroy
 
-	has_conditional_counter :guild, :status, 
-												 {:invitees_count => 0, :requestors_count => [1,2], :members_count => 5, :veterans_count => 4, :presidents_count => 3, :all_count => [3,4,5]}
+	#has_conditional_counter :guild, :status, 
+	#											 {:invitees_count => 0, :requestors_count => [1,2], :members_count => 5, :veterans_count => 4, :presidents_count => 3, :all_count => [3,4,5]}
 
 	def before_create
 		return if status == 3

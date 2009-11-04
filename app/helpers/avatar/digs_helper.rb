@@ -1,2 +1,0 @@
-module Avatar::DigsHelper
-end
