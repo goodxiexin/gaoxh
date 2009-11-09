@@ -13,12 +13,14 @@ class EventAlbum::PhotosController < ApplicationController
 
   def show
     @participation = @event.participations.find_by_participant_id(current_user.id)
-    @comments = @photo.comments.user_viewable(current_user.id)
+    @comments = @photo.comments
   end
 
   def create_multiple
     @photos = []
-    params[:photos].each { |attributes|  @photos << @album.photos.create(attributes) }
+    params[:photos].each do
+			|attributes|  @photos << @album.photos.create(attributes.merge({:poster_id => current_user.id, :game_id => @album.game_id}))
+		end
 		# hack
 		if current_user.application_setting.emit_photo_feed
 			item = @album.feed_items.create(:data => {:ids => @photos.map(&:id), :poster_id => current_user.id})

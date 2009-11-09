@@ -1,6 +1,6 @@
 class Event::CommentsController < CommentsController
 
-  layout 'app'
+  layout 'app2'
 
   before_filter :catch_participation, :only => [:index, :create]
 

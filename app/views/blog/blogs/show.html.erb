@@ -25,26 +25,8 @@
     <%= @blog.content %>
   </div>
   <div id='friend_tags'>
-  标签: <%= @blog.tags.map { |t| profile_link t.friend }.join(',') %>
+  标签: <%= @blog.tags.map { |t| profile_link t.tagged_user }.join(',') %>
   </div>
 </div>
 
-<div id='blog_comments_<%= @blog.id %>'>
-  <%= render :partial => 'blog/comments/comment', :collection => @comments %>
-</div>
-
-<div class='msg-body'>
-  <% form_remote_for :comment, :url => blog_comments_url(@blog) do |f| %>
-  <div class='composer'>
-    <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-    <%= f.text_area 'content', :rows => 5, :cols => 75, :id => "blog_comment_content_#{@blog.id}" %>
-  </div>
-  <div class='emotion'>
-    <%= emotion_link "blog_comment_content_#{@blog.id}" %>
-  </div>
-  <div class='button'>
-    <%= f.submit '提交', :class => 'confirm-button' %>
-    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
-  </div>
-  <% end %>
-</div>
+<%= render :partial => 'comments/comment_box', :locals => {:type => 'blog', :commentable => @blog} %>

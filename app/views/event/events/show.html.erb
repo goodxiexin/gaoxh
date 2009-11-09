@@ -1,73 +1,149 @@
 <% content_for :left do %>
-  <div style="text-align:center;padding: 5px">
-    <%= album_cover @event.album, :medium %><br/>
+<div class="mcAvatar">
+	<a href="#"></a>
+  <div class="picwrap">
+		<div class="middle"><div class="middle-center"><div class="center">
+			<%= album_cover @event.album, :size => :medium %>
+    </div></div></div>
   </div>
-  <% if @user == current_user and !@event.past%>
-    <%= render :partial => 'operations' %><br/>
-  <% end %>
-  <% if !@event.past %>
-    <%= render :partial => 'rsvp' %><br/>
-  <% end %>
-  <%= render :partial => 'other_invites' %>
+</div>
+<div class="avatarbox">
+	<b>组织者：</b><span><%= profile_link @event.poster %></span>
+</div>
+<% if current_user == @user and !@event.past%>
+	<%= render :partial => 'operations' %>
+<% end %>
+<% if !@event.past %>
+	<%= render :partial => 'rsvp' %>
+<% end %>
 <% end %>
 
-<div class='event-show'>
-  <div class='event-title'>
-    <%= @event.title %>
+<% content_for :right do %>
+<div class="multibox">
+	<div class="title">
+		<%= link_to "更多", event_participations_url(@event, :type => 1) %>
+    <b>可能参加的人</b>
   </div>
-  <div class='info'>
-    <%= label_tag '', '主办人' %> <%= profile_link @event.poster %><br/>
-    <%= label_tag '', '游戏' %> <%= @event.game.name %><br/>
-    <% if @event.game_area %>
-      <%= label_tag '', '服务区' %> <%= @event.game_area.name %><br/>
-    <% end %>
-    <%= label_tag '', '服务器' %> <%= @event.game_server.name %><br/>
-    <%= label_tag '', '日期' %> <%= "从#{ftime @event.start_time}到#{ftime @event.end_time}" %>
+  <div class="photolist-box">
+		<ul class="collection s_clear">
+			<% @event.maybe_participants[0..5].each do |p| %>
+			<li>
+				<div class="middle"><div class="middle-center"><div class="center"><%= avatar p %></div></div></div>
+        <p><%= profile_link p %></p>
+			</li>
+			<% end %>
+    </ul>
   </div>
-  <div class='detail'>
-    <h3>Description:</h3>
-    <%= @event.description %>
+</div>
+<div class="multibox">
+  <div class="title">
+    <%= link_to "更多", event_participations_url(@event, :type => 1) %>
+    <b>不参加的朋友</b>
   </div>
-  <div class='detail'>
-    <h3>Photos:</h3>
-    <% @album.photos[0..4].each do |p| %>
-      <%= photo_link p, :small %>
-    <% end %>
-    <div class='view-all'>
-      <%= link_to '查看全部', event_album_url(@album) %>
-    </div>
-  </div>
-  <div class='detail'>
-    <h3>确认会去的朋友:</h3>
-    <% @event.confirmed_participants.each do |p| %>
-        <%= avatar p %>
-    <% end %>
-    <div class='view-all'>
-      <%= link_to '查看全部', event_participations_url(@event, :type => 0) %>
-    </div>
-  </div>
-  <div class='comment'>
-    <h3>留言版:</h3>
-    <div>
-    <% if @participation %>
-      <% form_remote_for :comment, :url => event_comments_url(@event) do |f| %>
-      <div class='composer'>
-        <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-        <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "return limit_words_of_textarea(this, 140, $('comment_words_count'));" %>
-      </div>
-      <div class='button'>
-        <%= f.submit '提交', :class => 'confirm-button' %>
-        <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
-      </div>  
+  <div class="photolist-box">
+    <ul class="collection s_clear">
+      <% @event.declined_participants[0..5].each do |p| %>
+      <li>
+        <div class="middle"><div class="middle-center"><div class="center"><%= avatar p %></div></div></div>
+        <p><%= profile_link p %></p>
+      </li>
       <% end %>
-      <div id="comment_words_count" class="status-count">0/140</div>
-      <div><%= emotion_link 'comment_content' %></div>
-    <% else %>
-      只有活动的参与者才能留言
-    <% end %>
-    <div class='view-all'><%= link_to '查看全部', event_comments_url(@event) %></div>
+    </ul>
   </div>
-  <div id='comments'>
-    <%= render :partial => 'event/comments/comment', :collection => @comments %>
+</div>
+<div class="multibox">
+  <div class="title">
+    <%= link_to "更多", event_participations_url(@event, :type => 1) %>
+    <b>被邀请的人</b>
   </div>
+  <div class="photolist-box">
+    <ul class="collection s_clear">
+      <% @event.invitees[0..5].each do |p| %>
+      <li>
+        <div class="middle"><div class="middle-center"><div class="center"><%= avatar p %></div></div></div>
+        <p><%= profile_link p %></p>
+      </li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<% end %>
+
+<div class='box02 canvas_con'>
+<div class="formComposer">
+	<h3 class="png">名称：<b><%= @event.title %></b></h3>
+	<div class="formcontent">
+		<div class="rows s_clear">
+      <div class="fldid"><label for="server">游戏：</label></div>
+			<div class="fldvalue"><%= @event.game.name %></div>
+    </div>
+		<% unless @event.game.no_areas? %>
+		<div class="rows s_clear">
+      <div class="fldid"><label for="server">游戏服务区：</label></div>
+      <div class="fldvalue"><%= @event.game_area.name %></div>
+    </div>
+		<% end %>
+		<div class="rows s_clear">
+      <div class="fldid"><label for="server">游戏服务器：</label></div>
+      <div class="fldvalue"><%= @event.game_server.name %></div>
+    </div>
+		<div class="rows s_clear">
+      <div class="fldid"><label for="server">时间：</label></div>
+      <div class="fldvalue">从<%= ftime @event.start_time %>到<%= ftime @event.end_time %></div>
+    </div>
+	</div>
+</div>
+
+  <div class="multibox">
+    <div class="title"><b>描述</b></div>
+    <div class="photolist-big-box">
+			<%= @event.description %>
+		</div>
+  </div>
+
+	<div class="multibox">
+		<div class="title"><%= link_to "更多", event_album_url(@album) %><b>照片</b></div>
+    <div class="photolist-big-box">
+			<ul class="collection s_clear">
+				<% @album.photos[0..4].each do |p| %>
+					<li>
+						<div class="middle"><div class="middle-center"><div class="center"><%= photo_link p, :class => 'imgbox02' %></div></div></div>
+          </li>
+				<% end %>
+      </ul>
+    </div>
+  </div>
+	<div class="multibox">
+		<div class="title"><%= link_to "更多", event_participations_url(@event, :type => 0) %><b>参加的人</b></div>
+    <div class="photolist-box">
+			<ul class="collection s_clear">
+				<% @event.confirmed_participants[0..6].each do |p| %>
+					<li>
+						<div class="middle"><div class="middle-center"><div class="center"><%= avatar p, :class => 'imgbox01' %></div></div></div>
+            <p><%= profile_link p %></p>
+          </li>
+				<% end %>
+      </ul>
+    </div>
+  </div>
+	<div class="bookbox">
+		<h3><label for="book">留言板</label>(<%= link_to "查看所有", event_comments_url(@event) %>)</h3>
+    <div class="formcontent s_clear">
+			<% form_remote_for :comment, :url => event_comments_url(@event), :condition => "validate_comment($('comment_content'))" do |f| %>
+				<%= hidden_field_tag 'comment[recipient_id]', @event.poster_id %>
+				<div class="rows">
+					<div class="textarea-wrap"><div class="textarea-wide">
+						<%= f.text_area 'content', :class => 'textarea' %>
+          </div></div>
+        </div>
+        <div class="buttons">
+					<span class="button"><span><button type="submit">发布</button></span></span>
+					<%= emotion_link 'comment_content' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="feed-box" id='comments'>
+		<%= render :partial => 'event/comments/comment', :collection => @comments %>
+	</div>
 </div>

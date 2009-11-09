@@ -94,19 +94,19 @@ ActionController::Routing::Routes.draw do |map|
   #
   # avatar album
   #
-  map.resources :avatar_albums, :controller => 'avatar/albums' do |albums|
+  map.resources :avatar_albums, :controller => 'avatar_album/albums' do |albums|
  
-    albums.resources :comments, :controller => 'avatar/album_comments'
+    albums.resources :comments, :controller => 'avatar_album/album_comments'
  
   end
 
-  map.resources :avatars, :controller => 'avatar/photos', :member => {:set => :post, :update_notation => :put} do |avatars|
+  map.resources :avatars, :controller => 'avatar_album/photos', :member => {:set => :post, :update_notation => :put} do |avatars|
 
-    avatars.resources :comments, :controller => 'avatar/photo_comments'
+    avatars.resources :comments, :controller => 'avatar_album/photo_comments'
 
-    avatars.resources :tags, :controller => 'avatar/tags'
+    avatars.resources :tags, :controller => 'avatar_album/tags'
 
-    avatars.resources :digs, :controller => 'avatar/digs'
+    avatars.resources :digs, :controller => 'avatar_album/digs'
 
   end
 
@@ -123,7 +123,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :personal_photos, :controller => 'personal_album/photos', :member => {:cover => :post, :update_notation => :put},
                 :collection => {:hot => :get, :update_multiple => :put, :edit_multiple => :get, :create_multiple => :post, :relative => :get} do |photos|
 
-    photos.resources :comments, :controller => 'personal_album/comments'
+    photos.resources :comments, :controller => 'personal_album/photo_comments'
 
     photos.resources :tags, :controller => 'personal_album/tags'
 
@@ -246,7 +246,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :someone_friends, :controller => 'friend/someone_friends'
 
-  map.resources :friend_requests, :controller => 'friend/requests', :member => {:accept => :delete, :destroy => :delete}
+  map.resources :friend_requests, :controller => 'friend/requests', :member => {:accept => :put, :decline => :delete}
 
 	map.resources :friend_impressions, :controller => 'friend/impressions'
 
@@ -259,7 +259,7 @@ ActionController::Routing::Routes.draw do |map|
 
 	map.resources :notifications
 
-	map.resources :mails, :member => {:reply => :post}
+	map.resources :mails, :member => {:reply => :post}, :collection => {:read_multiple => :put, :unread_multiple => :put, :destroy_multiple => :delete}
 
 	map.resources :pokes, :collection => {:destroy_all => :delete}
 

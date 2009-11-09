@@ -17,7 +17,7 @@
     <tr>
   <% end %>
   <td>
-    <%= photo_link p %><p>
+    <%= photo_link p, :size => :large %><p>
     <% if @user == current_user %>
       <%= link_to '编辑', edit_event_photo_url(p), :rel => 'facebox' %>|
       <%= facebox_confirm '删除', event_photo_url(p), {:msg => "你确定要删除这张照片吗?", :method => :delete} %>
@@ -38,26 +38,12 @@
 <% end %>
 
 <p class="albumTime">
-  <span class="time-update"><%= ftime @album.updated_at %>更新</span><br/>
+  <% unless @album.uploaded_at.blank? %>
+    <span class="time-update"><%= ftime @album.uploaded_at %>更新</span><br/>
+  <% end %>
   <span class="time-create"><%= ftime @album.created_at %>创建</span>
 </p>
 
-<div id='comments'>
-  <%= render :partial => 'event_album/album_comments/comment', :collection => @comments %>
-</div>
+<%= render :partial => 'comments/comment_box', :locals => {:type => 'event_album', :commentable => @album} %>
 
-<div class='msg-body'>
-  <% form_remote_for :comment, :url => event_album_comments_url(@album) do |f| %>
-  <div class='composer'>
-    <%= hidden_field_tag 'comment[recipient_id]', @user.id%>
-    <%= f.text_area 'content', :rows => 5, :cols => 75, :onkeyup => "limit_words_of_textarea(this, 140, $('word_count'));" %>
-  </div>
-  <div class='button'>
-    <%= f.submit '提交', :class => 'confirm-button' %>
-    <%= f.label '悄悄话' %><%= f.check_box 'whisper' %>
-  </div>
-  <div class='word-count' id='word_count'>0/140</div>
-  <div class='emotion'><%= emotion_link "comment_content" %></div>
-  <% end %>
-</div>
 

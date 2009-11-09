@@ -1,6 +1,6 @@
 class Friend::FriendsController < ApplicationController
 
-  layout 'user'
+  layout 'app'
 
   before_filter :login_required, :setup
 
@@ -9,13 +9,13 @@ class Friend::FriendsController < ApplicationController
   def index
     case params[:term].to_i
     when 0
-      @friends = current_user.friends.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
+      @friends = current_user.friends.paginate :page => params[:page], :per_page => 12, :order => 'login ASC'
     when 1
       game = Game.find(params[:game_id])
-      @friends = current_user.friends.find_all {|f| f.games.include?(game) }.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
+      @friends = current_user.friends.find_all {|f| f.games.include?(game) }.paginate :page => params[:page], :per_page => 12, :order => 'login ASC'
     when 2
 			guild = Guild.find(params[:guild_id])
-      @friends = current_user.friends.find_all {|f| f.participated_guilds.include?(guild) }.paginate :page => params[:page], :per_page => 10, :order => 'created_at DESC'
+      @friends = current_user.friends.find_all {|f| f.participated_guilds.include?(guild) }.paginate :page => params[:page], :per_page => 12, :order => 'created_at DESC'
     end
   end
 
@@ -34,7 +34,7 @@ class Friend::FriendsController < ApplicationController
 
   def search
     @friends = current_user.friends.find_all {|f| f.login.include?(params[:key]) }
-    @friends = @friends.paginate :page => params[:page], :per_page => 10, :order => 'login ASC'
+    @friends = @friends.paginate :page => params[:page], :per_page => 12, :order => 'login ASC'
     @remote = {:update => 'friends', :url => {:action => 'search', :key => params[:key]}}
     render :partial => 'friends', :object => @friends
   end

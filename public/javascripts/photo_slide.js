@@ -44,7 +44,7 @@ var PhotoSlide = Class.create({
 	},
 
 	load_image: function(idx, photo_idx){
-		this.frames[idx].innerHTML = "<a href='http://localhost:3000/" + this.photo_type + "/" + this.photo_ids[photo_idx] +"'><img src='" +  this.photos[photo_idx].src +"' /></a>";
+		this.frames[idx].innerHTML = "<a class='imgbox01' href='http://localhost:3000/" + this.photo_type + "/" + this.photo_ids[photo_idx] +"'><img src='" +  this.photos[photo_idx].src +"' /></a>";
 	},
 
 	next: function(){

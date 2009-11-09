@@ -22,13 +22,13 @@ FriendInfo = Class.create({
 
 FriendTagBuilder = Class.create({
 
-  initialize: function(toggle_button, text_field, friend_ids){
+  initialize: function(friend_ids){
     this.tags = new Hash(); // friend_id => div
     this.new_tags = new Hash(); // friend_id => div
     for(var i=0;i<friend_ids.length;i++){
       this.tags.set(friend_ids[i], $('friend_'+friend_ids[i]));
     }
-    this.toggle_button = $(toggle_button);
+    this.toggle_button = $('toggle_button');
     this.toggle_button.observe('click', function(e){
       if(this.popup && this.popup.visible()){
         this.hide_friends();
@@ -36,16 +36,17 @@ FriendTagBuilder = Class.create({
         this.show_friends();
       }
     }.bind(this));
-    this.text_field = $(text_field);
+    this.text_field = $('friend_login');
   },
 
-  remove_tag: function(friend_id, tag_id){
-    new Ajax.Request('/friend_tags/' + tag_id, {
+  remove_tag: function(friend_id, tag_id, token){
+    new Ajax.Request('/friend_tags/destroy?id=' + tag_id, {
 			method: 'delete',
+			parameters: "authenticity_token=" + encodeURIComponent(token),
       onSuccess: function(transport){
-        var tag = this.tags.unset(friend_id);
+        var tag = this.tags.unset(friend_id);alert(tag);
         if(tag) tag.remove();
-      }
+      }.bind(this)
     });
   },
 

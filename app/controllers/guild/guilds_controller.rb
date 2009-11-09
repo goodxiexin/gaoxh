@@ -1,6 +1,6 @@
 class Guild::GuildsController < ApplicationController
 
-  layout 'user'
+  layout 'app'
 
   before_filter :login_required, :setup
 
@@ -11,10 +11,11 @@ class Guild::GuildsController < ApplicationController
   end
 
   def show
-    @comments = @guild.comments.user_viewable(current_user.id).paginate :page => 1, :per_page => 10
+    @comments = @guild.comments.paginate :page => 1, :per_page => 10
     @membership = @guild.memberships.find_by_user_id(current_user.id)
     @album = @guild.album
-  end
+		render :action => 'show', :layout => 'app2'
+	end
 
   def new
   end
@@ -22,7 +23,10 @@ class Guild::GuildsController < ApplicationController
   def create
     @guild = Guild.new(params[:guild].merge({:president_id => current_user.id}))# virtual attribute
     if @guild.save
-      @guild.album.create_cover(params[:photo]) unless params[:photo].blank?
+			unless params[:photo].blank?
+				@photo = @guild.album.photos.create(params[:photo])
+				@guild.album.update_attribute('cover_id', @photo.id) 
+			end
       redirect_to guild_url(@guild)
     else
       render :action => 'new'

@@ -12,7 +12,7 @@
         <%= mail_link mail, 'sent' %><br/>
         <span class='mail-content-truncate'><%= mail.content %></span>
       </td>
-      <td class='operation'><%= facebox_confirm 'x', mail_url(mail, :type => 0), {:method => :delete, :msg =>'你确认要删除这些邮件吗?'} %></td>
+      <td class='operation'><%= link_to_remote 'x', :url => mail_url(mail, :type => 0), :method => :delete %></td>
     </tr>
   <% end %>
 </table>

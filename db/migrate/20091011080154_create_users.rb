@@ -22,8 +22,8 @@ class CreateUsers < ActiveRecord::Migration
       t.integer :videos_count, :default => 0
       t.integer :statuses_count, :default => 0
       t.integer :comments_count, :default => 0
-      t.integer :event_requests_count, :default => 0
-      t.integer :event_invitations_count, :default => 0
+      t.integer :requests_count, :default => 0
+      t.integer :invitations_count, :default => 0
       t.timestamps
     end
   end

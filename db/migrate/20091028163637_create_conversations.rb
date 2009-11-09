@@ -4,6 +4,7 @@ class CreateConversations < ActiveRecord::Migration
 			t.integer :messages_count, :default => 0
 			t.integer :sender_id
 			t.integer :recipient_id
+			t.string	:title
       t.timestamps
     end
   end

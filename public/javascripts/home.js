@@ -6,11 +6,12 @@ HomeManager = Class.create({
 		this.feeds_div = $('feed_list');
 		this.more_feeds_div = $('more_feed');
 		this.time_range_id = id;
+		this.feed_categories = $('feed_menu').childElements();
 	},
 
 	loading: function(){
 		this.old_more_feeds_div = this.more_feeds_div.innerHTML;
-		this.more_feeds_div.innerHTML = "<img src='" + this.loading_image.src + "'/>";
+		this.more_feeds_div.innerHTML = "<div style='textAligin: center'><img src='" + this.loading_image.src + "'/></div>";
 	},
 
 	no_feeds: function(){
@@ -24,6 +25,13 @@ HomeManager = Class.create({
 	},
 
 	show_feeds: function(type){
+		for(var i=0;i < this.feed_categories.length;i++)
+			this.feed_categories[i].setStyle({});
+		if(type == null){
+			this.feed_categories[0].setStyle({class: 'hover'});
+		}else{
+			this.feed_categories[type+1].setStyle({class: 'hover'});
+		}
     this.loading();
 		this.feeds_div.innerHTML = '';
 		this.time_range_id = 0;

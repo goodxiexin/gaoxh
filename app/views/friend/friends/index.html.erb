@@ -1,41 +1,60 @@
-<% content_for :left do %>
-  <%= render :partial => '/app_menu' %>
-<% end %>
+<div id="canvas" class="round_r_t"><div class="round_l_t"><div class="round_r_b"><div class="round_l_b">
+                <div class="round_m"><div class="round_body">
+                    <h1 class="big-mygame">好友</h1>
+                    <div class="box02 canvas_int">
+                        <div class="tab tab01">
+														<%= render :partial => 'menu' %>
+                        </div>
+                        <div class="friend-box">
+                            <div class="friend-wrap s_clear">
+                                <div class="friend-menu menu-list">
+                                    <ul>
+																			<h3>游戏</h3>
+																			<% current_user.games.each do |g| %>
+																				<% if g.id == params[:game_id].to_i %>
+																					<li class='current'>
+																				<% else %>
+																					<li>
+																				<% end %>
+																				<%= link_to g.name, friends_url(:term => 1, :game_id => g.id) %></li>
+																			<% end %>
+																			<h3>工会</h3>
+																			<% current_user.participated_guilds.each do |g| %>
+																				<% if g.id == params[:guild_id].to_i %>
+                                          <li class='current'>
+                                        <% else %>
+                                          <li>
+                                        <% end %>
+																				<%= link_to g.name, friends_url(:term => 2, :guild_id => g.id) %></li>
+																			<% end %>
+                                    </ul>
+                                </div>
+                                <div class="friend-list">
+																	<div class="friend-content">
+                                        <div class="friend-list-header">
+																					<div class="right">
+																						<div class="textfield">
+																							<%= text_field_tag 'search', nil %>
+																							<%= observe_field :search,
+																																:complete  => "facebox.watchClickEvents();",
+																																:update    => "friends",
+																																:frequency => 1,
+																																:url       => search_friends_url(current_user),
+																																:with      => "'key='+$('search').value",
+																																:method    => :get  %>
+																						</div>
+                                          </div>
+																					所有好友
+                                        </div>
+                                        <div class="friend-list-body" id='friends'>
+																					<%= render :partial => 'friends', :object => @friends %>
+																				</div>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+						</div></div>
+            </div></div></div></div>
+        </div>
 
-<%= render :partial => 'friend/menu' %><br/>
-
-<ul>
-  <h3>游戏分类</h3>
-  <% current_user.games.each do |game| %>
-    <li><%= link_to game.name, friends_url(:term => 1, :game_id => game.id) %></li>
-  <% end %>
-</ul>
-
-<ul>
-  <h3>工会分类</h3>
-	<% current_user.participated_guilds.each do |guild| %>
-		<li><%= link_to guild.name, friends_url(:term => 2, :guild_id => guild.id) %></li>
-	<% end %>
-</ul>
-
-<ul>
-  <h3><%= link_to "所有好友(#{current_user.friends.count})", friends_url(:term => 0) %></h3>
-</ul>
-
-<div class='friendListHead'>
-  <h3>所有好友</h3>
-  <div class='friendFinder'>
-    <%= text_field_tag 'search', '搜索你的好友...', :onfocus => "this.clear();" %>
-    <%= observe_field :search,
-                      :complete  => "facebox.watchClickEvents();",
-                      :update    => "friends",
-                      :frequency => 1,
-                      :url       => search_friends_url(current_user),
-                      :with      => "'key='+$('search').value",
-                      :method    => :get  %>
-  </div>
-</div>
-
-<div id="friends">
-  <%= render :partial => 'friends', :object => @friends %>
-</div>

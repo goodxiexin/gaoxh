@@ -4,8 +4,6 @@ class Blog < ActiveRecord::Base
 
 	acts_as_commentable :order => 'created_at ASC'
 
-	acts_as_friend_taggable :class_name => 'FriendTag'
-	
 	acts_as_diggable
 
 	acts_as_list :order => 'created_at', :scope => 'poster_id'
@@ -15,6 +13,10 @@ class Blog < ActiveRecord::Base
 	has_conditional_counter :poster, :draft, {:blogs_count => false, :drafts_count => true}
 
 	has_many :feed_items, :dependent => :destroy, :as => 'originator'
+
+	has_many :tags, :class_name => 'FriendTag', :as => 'taggable', :dependent => :destroy
+
+	has_many :relative_users, :through => :tags, :source => 'tagged_user'
 
   validate do |blog|
     blog.errors.add_to_base('标题不能为空') if blog.title.blank?
@@ -26,9 +28,7 @@ class Blog < ActiveRecord::Base
 	# virtual attribute tags
 	# this is convenient for mass assignment
   def tags=(ids)
-    poster.friends.find(ids).each { |f| tags.build(:friend_id => f.id) }
-  rescue
-    raise FriendTag::TagNoneFriendError
+    poster.friends.find(ids).each { |f| tags.build(:tagged_user_id => f.id, :poster_id => poster_id) }
   end
 
 end

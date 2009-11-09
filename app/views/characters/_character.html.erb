@@ -1,13 +1,17 @@
 <li id='character_<%= character.id %>'>
-	<h4><%= character.name %><%= link_to_function "编辑", "profile_manager.edit_character_info(#{character.id});" %></h4>
+	<h4><%= label_tag '', '人物昵称: '%> <%= character.name %><%= link_to_function "编辑", "profile_manager.edit_character_info(#{character.id});" %></h4>
 	<div>
-  <p><%= label_tag '', 'level: '%><%= character.level %></p>
-  <p><%= label_tag '', 'game: '%><%= character.game.name %></p>
+  <p><%= label_tag '', '等级: '%><%= character.level %></p>
+  <p><%= label_tag '', '游戏: '%><%= character.game.name %></p>
   <% unless character.game.no_areas %>
-    <p><%= label_tag '', 'areas: '%><%= character.area.name %></p>
+    <p><%= label_tag '', '区域: '%><%= character.area.name %></p>
   <% end %>
-  <p><%= label_tag '', 'server: '%><%= character.server.name %></p>
-  <p><%= label_tag '', 'race: '%><%= character.race.name %></p>
-  <p><%= label_tag '', 'profession: '%><%= character.profession.name %></p>
+  <p><%= label_tag '', '服务器: '%><%= character.server.name %></p>
+  <% unless character.game.no_races %>
+    <p><%= label_tag '', '种族: '%><%= character.race.name %></p>
+  <% end %>
+  <% unless character.game.no_professions %>
+    <p><%= label_tag '', '职业: '%><%= character.profession.name %></p>
+  <% end %>
 	</div>
 </li>

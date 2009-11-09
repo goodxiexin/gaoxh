@@ -18,7 +18,7 @@ class PersonalAlbum::AlbumsController < ApplicationController
   end
 
   def show
-		@comments = @album.comments.user_viewable(current_user.id) 
+		@comments = @album.comments 
   end
 
   def new
@@ -70,8 +70,10 @@ class PersonalAlbum::AlbumsController < ApplicationController
       Photo.update_all("album_id = #{params[:album][:id]}", "album_id = #{@album.id}")
     end
     @album.destroy
-    redirect_to personal_albums_url(:id => @user.id)  
-  end
+		render :update do |page|
+			page.redirect_to personal_albums_url(:id => @user.id)  
+		end
+	end
 
   def update_description
     if @album.update_attributes(params[:album])

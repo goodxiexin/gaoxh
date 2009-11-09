@@ -6,7 +6,7 @@ class EventAlbum::AlbumsController < ApplicationController
 
   def show
     @participation = @event.participations.find_by_participant_id(current_user.id)
-    @comments = @album.comments.user_viewable(current_user.id)
+    @comments = @album.comments
   end
 
   def update_description

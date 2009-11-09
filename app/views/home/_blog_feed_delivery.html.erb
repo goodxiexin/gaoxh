@@ -1,11 +1,15 @@
 <% delivery = blog_feed_delivery %>
 <% blog = delivery.feed_item.originator %>
-<div id='feed_delivery_<%= delivery.id %>'>
-	<div><%= avatar blog.poster %></div>
-	<div>
-		<%= profile_link blog.poster %>撰写了日志<%= blog_link blog %>
+<div class="feed-list" id='feed_delivery_<%= delivery.id %>'>
+	<div class="feed-icon icon-blog"></div>
+  <p>
+		<%= profile_link blog.poster %>
+		编写了日志
+	</p>
+  <div class="feed-content">
+		<%= truncate blog.content, :length => 80, :omission => '...' %>
 	</div>
-	<div><%= truncate blog.content, 80 %></div>
+  <p><%= ftime blog.created_at %><%= link_to_function '评论', "show_comment_form('blog', #{blog.id}, null)" %></p>
+	<%= render :partial => 'comments/folded_comment_box', :locals => {:type => 'blog', :commentable => blog} %>
 	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
-	<div><%= ftime delivery.created_at %></div>
 </div>

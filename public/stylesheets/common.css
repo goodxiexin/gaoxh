@@ -75,15 +75,15 @@ a:active {text-decoration: none;}
 /*图片展示*/
 
 /*菜单列表*/
-.menu-list li{border-bottom:1px #E7F0E0 solid;height:30px;line-height:30px;overflow:hidden;position:relative}
-.menu-list li a{display:block;height:100%;padding:0 5px 0 14px;color:#25700D}
-.menu-list li a:hover{background:#f1f9e1;color:#25700D}
-.menu-list li a span{color:#7E7F80}
-.menu-list li.current a,.menu-list li.current a:hover{background:#7BBE31;color:#000}
-.menu-list li.current a span{color:#fff}
-.menu-list .item-bottom{height:30px;line-height:30px;padding-left:14px;}
-.menu-list .item-bottom a{color:#D63200}
-.menu-list .item-bottom a:hover{text-decoration:underline}
+.menu-bg-list li{border-bottom:1px #E7F0E0 solid;height:30px;line-height:30px;overflow:hidden;position:relative}
+.menu-bg-list li a{display:block;height:100%;padding:0 5px 0 14px;color:#25700D}
+.menu-bg-list li a:hover{background:#f1f9e1;color:#25700D}
+.menu-bg-list li a span{color:#7E7F80}
+.menu-bg-list li.current a,.menu-bg-list li.current a:hover{background:#7BBE31;color:#000}
+.menu-bg-list li.current a span{color:#fff}
+.menu-bg-list .item-bottom{height:30px;line-height:30px;padding-left:14px;}
+.menu-bg-list .item-bottom a{color:#D63200}
+.menu-bg-list .item-bottom a:hover{text-decoration:underline}
 
 .menu-icon-list li{padding-left:22px;height:30px;line-height:30px;background:url(../images/icons/homeIcons.gif) no-repeat left -2000px;overflow:hidden}
 .menu-icon-list li a span{color:#D63200}
@@ -98,6 +98,11 @@ a:active {text-decoration: none;}
 .menu-icon-list01 li a:hover{text-decoration:underline}
 .menu-icon-list01 li.icon-add{background-position:left -424px}
 .menu-icon-list01 li.icon-invite{background-position:left -482px}
+
+.menu-list li{line-height:20px;}
+.menu-list li span{color:#25700D}
+.menu-list li a{color:#666}
+.menu-list li a:hover{color:#D63200}
 /*菜单列表*/
 
 input.gobtn{border:0;background:url(../images/skin/gobtn.png) no-repeat;width:22px;height:19px;}
@@ -110,7 +115,7 @@ input.gobtn{border:0;background:url(../images/skin/gobtn.png) no-repeat;width:22
 .textfield{padding:0 5px;width:100px;height:24px;line-height:24px;border:1px #6C9F43 solid;background:url(../images/skin/tf01.png) no-repeat;}
 .textfield input{margin:4px 0 0;width:100%;height:16px;color:#7E7F80;border:0;background:none}
 
-.textarea{padding:5px;border:1px #E7F0E0 solid;}
+.textarea{border:1px #E7F0E0 solid;background:#fff;width:350px;height:65px;}
 /*特殊组件*/
 
 /*按钮样式*/

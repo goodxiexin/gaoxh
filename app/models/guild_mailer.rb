@@ -20,7 +20,6 @@ class GuildMailer < ActionMailer::Base
 
 	def promotion guild, member, new_role, old_role
 		setup_email membership.user
-		subject			"Dayday3 - 
 	end
 
 protected

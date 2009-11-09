@@ -9,16 +9,17 @@ module ApplicationHelper
     end
   end
 
-  def avatar(user, size="small")
+  def avatar(user, opts={})
+		size = opts.delete(:size) || "medium"
     if user.avatar.blank?
-      link_to image_tag("default_#{size}.png"), profile_url(user.profile), :popup => true
+      link_to image_tag("default_#{size}.png", opts), profile_url(user.profile), :popup => true
     else
-      link_to image_tag(user.avatar.public_filename(size)), profile_url(user.profile), :popup => true
+      link_to image_tag(user.avatar.public_filename(size), opts), profile_url(user.profile), :popup => true
     end
   end
 
-  def profile_link(user)
-    link_to user.login, profile_url(user.profile), :popup => true
+  def profile_link(user, opts={})
+    link_to user.login, profile_url(user.profile), opts
   end
 
   def validation_image
@@ -73,11 +74,12 @@ module ApplicationHelper
     end
   end
 
-  def album_cover(album, size="medium")
+  def album_cover(album, opts={})
+		size = opts.delete(:size) || 'medium'
     if album.cover_id.blank?
-      link_to image_tag("default_cover_#{size}.jpg"), eval("#{album.class.to_s.underscore}_url(album)")
+      link_to image_tag("default_cover_#{size}.png", opts), eval("#{album.class.to_s.underscore}_url(album)")
     else
-      link_to image_tag(album.cover.public_filename(:medium)), eval("#{album.class.to_s.underscore}_url(album)")
+      link_to image_tag(album.cover.public_filename(size), opts), eval("#{album.class.to_s.underscore}_url(album)")
     end
   end
 
@@ -85,8 +87,9 @@ module ApplicationHelper
     link_to (truncate album.title, :length => 20), eval("#{album.type.underscore}_url(album)")
   end
 
-  def photo_link(photo, size="medium")
-    link_to (image_tag photo.public_filename(size)), eval("#{photo.type.underscore}_url(photo)")
+  def photo_link(photo, opts={})
+		size = opts.delete(:size) || "large"
+    link_to (image_tag photo.public_filename(size), opts), eval("#{photo.type.underscore}_url(photo)")
   end
 
   def dig_link diggable
@@ -123,15 +126,27 @@ module ApplicationHelper
 	end
 
 	def topic_link topic
-		link_to (truncate topic.subject, :length => 20), forum_topic_url(topic.forum, topic)
+		link_to (truncate topic.subject, :length => 40), forum_topic_url(topic.forum, topic)
 	end
 
-	def mail_link mail, type
-		link_to mail.title, mail_url(mail, :type => type)
+	def mail_link mail
+		if mail.recipient == current_user # in recv box
+			if mail.read_by_recipient
+				link_to mail.title, mail_url(mail, :type => 1), :id => "mail_title_#{mail.id}"
+			else
+				link_to "<h3>#{mail.title}</h3>", mail_url(mail, :type => 1), :id => "mail_title_#{mail.id}"
+			end
+		else # in sent box
+			link_to mail.title, mail_url(mail, :type => 0), :id => "mail_title_#{mail.id}"
+		end
 	end
 
 	def mail_select_tag
-    select_tag 'select', options_for_select([['---', '^_^'], ['全部选中','all'], ['选读过的', 'read'], ['选没读的', 'unread'], ['取消全选', 'none']], "---"), :onchange => "select_dropdown_onchange(this)"
+    select_tag 'select', options_for_select([['---', '^_^'], ['全部选中','all'], ['选读过的', 'read'], ['选没读的', 'unread'], ['取消全选', 'none']], "---"), :onchange => "mailbox.select_dropdown_onchange()"
   end
+
+	def button_submit text
+		"<button type='submit'>#{text}</button>"
+	end
 
 end

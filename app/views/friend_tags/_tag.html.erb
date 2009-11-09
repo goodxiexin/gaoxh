@@ -1,8 +1,8 @@
-<li class='user-tag'>
-  <div class='sbInfo' id='friend_<%= tag.friend_id %>'>
-  <%= profile_link tag.friend %>
+<li class='user-tag' id='friend_<%= tag.tagged_user_id %>'>
+  <div class='sbInfo'>
+  <%= profile_link tag.tagged_user %>
   </div>
   <div class='sbDel'>
-  <%= link_to_function 'x', "tag_builder.remove_tag(#{tag.friend_id}, #{tag.id});" %> 
+  <%= link_to_function 'x', "tag_builder.remove_tag(#{tag.tagged_user_id}, #{tag.id}, '#{form_authenticity_token}');" %> 
   </div>
 </li>

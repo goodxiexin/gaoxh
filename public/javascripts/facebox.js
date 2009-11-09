@@ -113,7 +113,16 @@ var Facebox = Class.create({
     		//Event.observe(document, 'click', this.keyPressListener);
 	},
 
-        show_notice: function(info){
+    show_tip: function(info){
+        var html = "<div class='header'><h3>提示</h3></div><div class='content'>" + info + "</div>";
+        html += "<div class='footer'><input class='confirm-button'  onclick='facebox.close();' value='确定' type='button'></div>";
+        
+        this.remove_loading();
+        this.set_content(html);
+        this.locate();
+    }, 
+
+    show_notice: function(info){
         	var html = "<div class='header'><h3>提示</h3></div><div class='content'>" + info + "</div>";
           	
  		this.remove_loading();
@@ -135,7 +144,6 @@ var Facebox = Class.create({
 
 	show_confirm: function(confirm_message, url, method){
 		var html = "<div class='header'><h3>请确认</h3></div><div class='content'>" + confirm_message + "</div>";
-                var idx = url.indexOf('authenticity_token=');
 		html += "<div class='footer'><input class='confirm-button'  onclick=\"new Ajax.Request('" + url +"', {method: '" + method + "', onSuccess: function(){}});\" value='确定' type='button'><input class='cancel-button' onclick='facebox.close();' value='取消' type='button'></div>";
 		this.remove_loading();
 		this.set_content(html);
@@ -172,13 +180,21 @@ var Facebox = Class.create({
 			image.src = elem.href;
 		} else {
 			var fb  = this;
-			var url = elem.href;
 			var confirm_message = elem.readAttribute('facebox_confirm');
 
 			if(confirm_message){
+        var start_idx = elem.href.indexOf('authenticity_token=');
+        var end_idx = elem.href.indexOf('&', start_idx);
+        var url = '';
+        if(end_idx < 0){
+          url = elem.href.substring(0, start_idx) + encodeURIComponent(elem.href.substring(start_idx));
+        }else{
+          url = elem.href.substring(0, start_idx) + encodeURIComponent(elem.href.substring(start_idx, end_idx)) + elem.href.substring(end_idx);
+        }
+
 				fb.show_confirm(confirm_message, url, elem.readAttribute('facebox_method'));
 			}else{
-				new Ajax.Request(url, {
+				new Ajax.Request(elem.href, {
 					method: 'get',
 					onFailure: function(transport){
 						fb.reveal(transport.responseText, klass);
@@ -201,6 +217,10 @@ document.observe('dom:loaded', function(){
 	//window.alert = function(mess){
   	//	return facebox.show_notice(mess);
 	//};
+
+    window.tip = function(mess){
+        return facebox.show_tip(mess);
+    };
 
 	// add a shortcut to facebox.show_error
 	window.error = function(mess) {

@@ -1,163 +1,101 @@
 // the first javascript file i have written in my life
 
-function get_mail_id(checkbox){
-  var idx = checkbox.value.indexOf('-');
-  return checkbox.value.substring(0, idx);
-}
+Mailbox = Class.create({
 
-function get_mail_read(checkbox){
-  var idx = checkbox.value.indexOf('-');
-  var len = checkbox.value.length;
-  return checkbox.value.substring(idx + 1, len);
-}
-
-function url_for(checkboxes, user_id, action){
-  var len = checkboxes.length;
-  var url = '/mails/' +action + '?';
-  for(var i=0;i<len;i++){
-    url += ('ids[]=' + get_mail_id(checkboxes[i]));
-    if(i != len - 1)
-      url += '&';
-  }
-  return url;
-}
-
-function get_all_mails(){
-  var checkboxes = [];
-  var inputs = $$('input');
-  for(var i=0;i<inputs.length;i++){
-    if(inputs[i].type == 'checkbox'){
-      checkboxes.push(inputs[i]);
-    }
-  }
-  return checkboxes;
-}
-
-function get_all_selected_mails(){
-  var checkboxes = [];
-  var inputs = $$('input');
-  for(var i=0;i<inputs.length;i++){
-    if(inputs[i].type == 'checkbox' && inputs[i].checked){
-      checkboxes.push(inputs[i]);
-    }
-  }
-  return checkboxes;
-}
-
-function get_all_read_mails(){
-  var checkboxes = [];
-  var inputs = $$('input');
-  for(var i=0;i<inputs.length;i++){
-    if(inputs[i].type == 'checkbox' && get_mail_read(inputs[i]) == 'true'){
-      checkboxes.push(inputs[i]);
-    }
-  }
-  return checkboxes;
-}
-
-function get_all_unread_mails(){
-  var checkboxes = [];
-  var inputs = $$('input');
-  for(var i=0;i<inputs.length;i++){
-    if(inputs[i].type == 'checkbox' && get_mail_read(inputs[i]) == 'false'){
-      checkboxes.push(inputs[i]);
-    }
-  }
-  return checkboxes;
-
-}
-
-function uncheck_all_checkboxes(){
-  var inputs = $$('input');
-  for(var i=0;i<inputs.length;i++){
-    if(inputs[i].type == 'checkbox'){
-      inputs[i].checked = false;
-    }
-  }
-}
-
-function selection_onchange(){
-  var checkboxes = get_all_selected_mails();
-  var len = checkboxes.length;
-  //TODO: change CSS
-}
-
-function select_dropdown_onchange(selector) {
-  
-  uncheck_all_checkboxes();
-
-  if($F(selector) == 'all'){
-    var checkboxes = get_all_mails();
-    var len = checkboxes.length;
-    for(var i=0;i<len;i++){
-      checkboxes[i].checked = true;
-    }
-  }else if($F(selector) == 'none'){
-    var checkboxes = get_all_mails();
-    var len = checkboxes.length;
-    for(var i=0;i<len;i++)
-      checkboxes[i].checked = false;
-  }else if($F(selector) == 'read'){
-    var checkboxes = get_all_read_mails();
-    var len = checkboxes.length;
-    for(var i=0;i<len;i++)
-      checkboxes[i].checked = true; 
-  }else if($F(selector) == 'unread'){
-    var checkboxes = get_all_unread_mails();
-    var len = checkboxes.length;
-    for(var i=0;i<len;i++)
-      checkboxes[i].checked = true;
-  }
-}
-
-function read_mails(user_id, type) {
-  var checkboxes = get_all_selected_mails();
-  var url = url_for(checkboxes, user_id, 'read_multiple');
-  url += '&type=' + type;
-  new Ajax.Request(url, {
-    asynchronous: true,
-    method: 'put',
-    onSuccess: function(transport) {
-      var checkboxes = get_all_selected_mails();
-      var len = checkboxes.length;
-      for(var i=0;i<len;i++){
-        var mail = $('mail_' + get_mail_id(checkboxes[i]) + '_title');
-        mail.style.fontWeight = '';
-        var checkbox = $('select_mail_' + get_mail_id(checkboxes[i]));
-        checkbox.value = get_mail_id(checkboxes[i]) + "-true";
-      }  
-      $('recv_mails_count').innerHTML = transport.responseText;
-    }
-  });
-}
-
-function unread_mails(user_id, type){
-  var checkboxes = get_all_selected_mails();
-  var url = url_for(checkboxes, user_id, 'unread_multiple');
-  url += '&type=' + type;
-  new Ajax.Request(url, {
-    asynchronous: true,
-    method: 'put',
-    onSuccess: function(transport) {
-      var checkboxes = get_all_selected_mails();
-      var len = checkboxes.length;
-      for(var i=0;i<len;i++){
-        var mail = $('mail_' + get_mail_id(checkboxes[i]) + '_title');
-        mail.style.fontWeight = 'bold';
-        var checkbox = $('select_mail_' + get_mail_id(checkboxes[i]));
-        checkbox.value = get_mail_id(checkboxes[i]) + "-false";
+	initialize: function(ids, read){
+		this.dropdown = $('select');
+		this.mails = new Hash();
+		for(var i=0;i<ids.length;i++){
+			this.mails.set(ids[i], {check_box: $('mail_select_' + ids[i]), title_div: $('mail_title_' + ids[i]), read: ( read[i] == 'true' ? true:false)});
+		}
+	},
+	
+	select_dropdown_onchange: function(){
+		this.mails.each(function(pair){
+      pair.value.check_box.checked = false;
+    }.bind(this));
+		if(this.dropdown.value == 'all'){
+			this.mails.each(function(pair){
+				pair.value.check_box.checked = true;
+			}.bind(this));
+		}else if(this.dropdown.value == 'none'){
+		}else if(this.dropdown.value == 'read'){
+			this.mails.each(function(pair){
+				if(pair.value.read)
+					pair.value.check_box.checked = true;
+			}.bind(this));
+		}else if(this.dropdown.value == 'unread'){
+			this.mails.each(function(pair){
+				if(!pair.value.read)
+					pair.value.check_box.checked = true;
+			}.bind(this));
+		}
+	},
+	
+	get_selected_ids: function(){
+		var ids = [];
+    this.mails.each(function(pair){
+      if(pair.value.check_box.checked){
+        ids.push(pair.key);
       }
-      $('unread_recv_mails').innerHTML = transport.responseText + " unread";
-    }
-  });
-}
+    });
+		return ids;
+	},
 
-function delete_mails(user_id, type){
-  var checkboxes = get_all_selected_mails();
-  var url = url_for(checkboxes, user_id, 'destroy_multiple');
-  url += ('&' + 'type=' + type);
-  new Ajax.Request(url, {method: 'delete'});
-}
+	read: function(authenticity_token){
+		var ids = this.get_selected_ids();
+    var params = "";
+    for(var i=0;i<ids.length;i++){
+      params += "ids[]=" + ids[i] + "&";
+    }
+    params += "authenticity_token=" + authenticity_token + "&";
+    params += "type=1";
+		new Ajax.Request('/mails/read_multiple', {
+			method: 'put',
+			parameters: params,
+			onSuccess: function(transport){
+				for(var i=0;i<ids.length;i++){
+					this.mails.get(ids[i]).title_div.style.fontWeight = '';
+					this.mails.get(ids[i]).read = true;
+				}
+			}.bind(this)
+		}); 	
+	},
+
+	unread: function(authenticity_token){
+    var ids = this.get_selected_ids();
+		var params = "";
+		for(var i=0;i<ids.length;i++){
+			params += "ids[]=" + ids[i] + "&";
+		}
+		params += "authenticity_token=" + authenticity_token + "&";
+		params += "type=1";
+    new Ajax.Request('/mails/unread_multiple', {
+      method: 'put',
+      parameters: params,
+      onSuccess: function(transport){
+        for(var i=0;i<ids.length;i++){
+          this.mails.get(ids[i]).title_div.style.fontWeight = 'bold';
+					this.mails.get(ids[i]).read = false;
+        }
+      }.bind(this)
+    });
+  },
+
+	destroy: function(authenticity_token, type){
+		var ids = this.get_selected_ids();
+    var params = "";
+    for(var i=0;i<ids.length;i++){
+      params += "ids[]=" + ids[i] + "&";
+    }
+    params += "authenticity_token=" + authenticity_token + "&";
+    params += "type=" + type;
+		new Ajax.Request('/mails/destroy_multiple', {
+			method: 'delete', 
+			parameters: params
+		});
+	}
+});
 
 function validate_mail(){
   var recipients = $('mail_recipients');
@@ -187,3 +125,13 @@ function validate_mail(){
   return !error;
 }
 
+
+MailBuilder = Class.create({
+
+	initialize: function(){
+	},
+
+	select_friends: function(){
+	}
+
+});

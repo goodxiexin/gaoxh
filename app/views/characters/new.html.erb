@@ -1,24 +1,25 @@
 <%= error_messages_for :character %>
 <% form_remote_for :character, :html => {:id => 'character_info_form'} do |f| %>
-  <%= f.label 'character ID: ' %>
+  <%= f.label '人物昵称: ' %>
   <%= f.text_field :name, :size => 10 %><br/>
 	<a id='character_name_info'></a>
-  <%= f.label 'level: ' %>
+  <%= f.label '级别: ' %>
   <%= f.text_field :level, :size => 10 %> <br/>
 	<a id='character_level_info'></a>
-	<%= f.label 'game: ' %>
+	<%= f.label '游戏: ' %>
   <%= collection_select :character, :game_id, Game.all, :id, :name, {:prompt => '---'}, {:onchange => "profile_manager.game_onchange()"} %><br/>
   <a id='character_game_info'></a>
-	<%= f.label 'area: ' %>
+    <div id='tips'><%= link_to_function "提示", "tip(\"由于游戏数量庞大，很多游戏已经停服，我们没有把所有游戏统计完成。这个游戏的资料就还不完全，请您在左边的意见／建议中告诉我们您所在游戏的所在服务器，我们会以最快速度为您添加。对您带来得不便，我们道歉。\");" %></div>
+	<%= f.label '区域: ' %>
   <%= collection_select :character, :area_id, [], :id, :name, {:prompt => '---'}, {:onchange => "profile_manager.area_onchange()"} %><br/>
   <a id='character_area_info'></a>
-	<%= f.label 'server: '%>
+	<%= f.label '服务器: '%>
   <%= collection_select :character, :server_id, [], :id, :name, {:prompt => '---'} %><br/>
 	<a id='character_server_info'></a>
-	<%= f.label 'prof: '%>
+	<%= f.label '职业: '%>
   <%= collection_select :character, :profession_id, [], :id, :name, {:prompt => '---'} %><br/>
 	<a id='character_profession_info'></a>
-	<%= f.label 'race: '%>
+	<%= f.label '种族: '%>
   <%= collection_select :character, :race_id, [], :id, :name, {:prompt => '---'} %><br/>
 	<a id='character_race_info'></a>
 	<%= button_to_function '创建', "profile_manager.create_character_info();" %>

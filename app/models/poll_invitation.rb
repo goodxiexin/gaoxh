@@ -1,6 +1,6 @@
 class PollInvitation < ActiveRecord::Base
 
-	belongs_to :user
+	belongs_to :user, :counter_cache => :invitations_count
 
 	belongs_to :poll
 

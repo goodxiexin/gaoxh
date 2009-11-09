@@ -1,10 +1,10 @@
 class HomeController < ApplicationController
 
-  layout 'user'
+  layout 'app'
 
   before_filter :login_required
 
-  TimeRange = [{:from => 1, :to => 0},
+  TimeRange = [{:from => 1, :to => 0}, # today
                {:from => 7, :to => 1},
                {:from => 30, :to => 7}]
 
@@ -43,8 +43,8 @@ class HomeController < ApplicationController
 protected
 
   def parse_and_increment_idx
-    @from = (TimeRange[@idx][:from] == 0)? '2000-1-1' : TimeRange[@idx][:from].days.ago.to_s(:db)
-    @to = (TimeRange[@idx][:to] == 0)? Time.now.to_s(:db) : TimeRange[@idx][:to].days.ago.to_s(:db)
+    @from = (TimeRange[@idx][:from] == 0)? '2000-1-1' : TimeRange[@idx][:from].days.ago.beginning_of_day.to_s(:db)
+    @to = (TimeRange[@idx][:to] == 0)? Time.now.to_s(:db) : TimeRange[@idx][:to].days.ago.beginning_of_day.to_s(:db)
     @idx = @idx + 1
   end
 

@@ -2,25 +2,16 @@
 <% status = item.originator %>
 <li>
   <span class='float-right'><%= facebox_confirm 'x', status_url(status), {:method => :delete, :msg => '你确定要删除这条状态吗?'}, {:id => "delete_status_#{status.id}"} %></span>
-  <%= avatar status.user %><br/>
-	<%= link_to "更多...", statuses_url(:id => status.user_id) %>
+  <%= avatar status.poster %><br/>
+	<%= link_to "更多...", statuses_url(:id => status.poster_id) %>
   <div class='status-content'>
     <p class='title'><span class='time'><%= ftime status.created_at %></span></p>
     <p class='body'>
       <%= status.content %>
       <%= link_to_function "#{status.comments_count}条回复", "" %>
     </p>
-    <div class='comment-list' id='status_comments_<%= status.id %>'>
-			<%= render :partial => 'status/comments/comment', :collection => status.comments %>
-		</div>
-    <div class='reply'>
-      <% form_remote_for :comment, :url => status_comments_url(status) do |f| %>
-        <span><%= avatar current_user %></span>
-        <%= f.text_area 'content', :rows => 1, :cols => 60, :id => "status_comment_content_#{status.id}" %>
-        <%= f.submit '提交' %>
-      <% end %>
-    </div>
-  </div>
+		<%= render :partial => 'comments/folded_comment_box', :locals => {:type => 'status', :commentable => status} %>	
+	</div>
 </li>
 <% end %>
 

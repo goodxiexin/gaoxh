@@ -1,8 +1,7 @@
 <% delivery = event_feed_delivery %>
 <% event = delivery.feed_item.originator %>
-<div id='feed_delivery_<%= delivery.id %>'>
-	<div><%= avatar event.poster %></div>
-	<div><%= profile_link event.poster %>发布了活动<%= event_link event %></div>
-	<div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
-	<div><%= ftime delivery.created_at %></div>
+<div class='feed-list' id='feed_delivery_<%= delivery.id %>'>
+  <div class="feed-icon icon-friend"></div>
+  <p><%= profile_link event.poster %>组织了活动<%= event_link event %></p>
+  <div><%= link_to_remote 'x', :url => feed_delivery_url(delivery), :method => :delete %></div>
 </div>

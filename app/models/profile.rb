@@ -16,6 +16,8 @@ class Profile < ActiveRecord::Base
 
 	has_many :feed_items, :as => 'originator', :dependent => :destroy
 
+	has_many :feed_deliveries, :as => 'recipient', :order => 'created_at DESC'
+
 	has_many :visitor_records, :order => 'created_at DESC'
 
 end

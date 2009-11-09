@@ -1,38 +1,30 @@
-<% event_items.each do |event| %>
-<% participation = event.participations.find_by_participant_id(current_user.id) %>
-<table class='event'>
+<table class="table01" cellpadding="0" cellspacing="1">
+  <% @events.each do |e| %>
+  <% participation = e.participations.find_by_participant_id(current_user.id) %>
   <tr>
-    <td class='header'><%= ftime2 event.start_time %></td>
-    <td class='none'></td>  <td class='none'></td>  
-  </tr>
-  <tr class='body'>
-    <td class='event-album-cover'><%= album_cover event.album, :medium %></td>
-    <td class='description'>
-      <span class='title'><%= link_to event.title, event_url(event)%></span><br/>
-      <div class='detail'>
-        <%= label_tag '', '创建者' %> <%= profile_link event.poster %><br/>
-        <%= label_tag '', '游戏' %> <%= game_link event.game %><br/>
-        <%= label_tag '', '服务器' %> <%= event.game_server.name %><br/>
-        <% if !event.game_area.blank? %>
-          <%= label_tag '', '服务区' %> <%= event.game_area.name  %><br/>
-        <% end %>
-        <%= label_tag '', '时间' %> <%= "from #{ftime event.start_time} to #{ftime event.end_time}" %><br/>
+    <td>
+      <div class="imgwrap"> 
+        <%= album_cover e.album, :class => 'imgbox01' %>
+      </div> 
+      <div class="data">
+        <p>名称：<span> <%= event_link e %> </span></p>
+        <p>游戏：<span> <%= game_link e.game %> </span></p>
+        <p>时间：<span> <%= ftime e.start_time %> 到 <%= ftime e.end_time %></span></p>
+        <p>组织者: <span> <%= profile_link e.poster %> </span></p>
+        <p>我的回应: <%= show_event_status participation, e %></p>   
       </div>
-      <% unless event.past %>
-        <span class='status'><%= show_event_status participation, event %></span>
-      <% end %>
     </td>
-    <td class='menu'>
-      <li><%= event.confirmed_count %>人参加<%= link_to '(查看)', event_participations_url(event, :type => 'confirmed') %></li>
-      <% if current_user == event.poster and !event.past %>
-        <li><%= link_to '编辑活动信息', edit_event_url(event) %></li>
-        <li><%= link_to '邀请更多人', new_event_invitation_url(event) %></li>
-        <li><%= facebox_confirm '放所有人鸽子', event_url(event), {:method => :delete, :msg => '你确定要取消这次活动吗'} %></li>
-      <% end %>
+    <td class='menu'> 
+      <li><%= link_to e.confirmed_count, event_participations_url(e, :type => 0) %> 人参加</li>
+      <% if e.poster == current_user and !e.past %>
+      <li><%= link_to '编辑活动信息', edit_event_url(e) %></li>
+      <li><%= link_to '邀请更多人', new_event_invitation_url(e) %></li>
+      <li><%= facebox_confirm '放所有人鸽子', event_url(e), {:method => :delete, :msg => '你确定要取消这次活动吗'} %></li>
+      <% end %> 
     </td>
   </tr>
+  <% end %>
 </table>
-<% end %>
 
 <% if @remote %>
   <%= will_paginate event_items, :renderer => 'RemoteLinkRenderer', :remote => @remote %>

@@ -1,6 +1,4 @@
-<div class='fby'>
-  <h3>menu: <%= link_to_function 'fold', "$('guild_menu').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
-  <div id='guild_menu'>
+  <div class='formcontent'>
 		<% if @membership.blank? %>
 			<span class='subtitle'>你还没加入这个工会里，是否<%= link_to '加入', new_guild_request_url(@guild, :show => 1), :rel => 'facebox' %></span>
 		<% elsif @membership.status == 0 %>
@@ -26,4 +24,3 @@
       <li><%= link_to '发信给会长' %></li>
     <% end %>
   </div>
-</div>

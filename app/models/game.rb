@@ -8,6 +8,6 @@ class Game < ActiveRecord::Base
 
   has_many :races, :class_name => 'GameRace', :dependent => :destroy
 
-	acts_as_taggable
+  acts_as_taggable
 
 end

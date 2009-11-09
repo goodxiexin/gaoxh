@@ -1,7 +1,5 @@
 class CommentsController < ApplicationController
 
-  layout 'user'
-
   before_filter :login_required, :catch_commentable
 
   before_filter :catch_comment, :only => [:destroy]
@@ -23,7 +21,7 @@ class CommentsController < ApplicationController
   end
 
   def index
-    @comments = @commentable.comments.user_viewable(current_user.id).paginate :page => params[:page], :per_page => params[:per_page]
+    @comments = @commentable.comments.paginate :page => params[:page], :per_page => 10
   end
 
 protected

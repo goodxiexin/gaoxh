@@ -130,20 +130,31 @@ ProfileManager = Class.create({
     $('character_race_id').innerHTML = html;
   },
 
+    reset_area_info: function(){
+        $('character_area_id').innerHTML = '';
+    },
+
+    reset_server_info: function(){
+        $('character_server_id').innerHTML = '';
+    },
 
 	game_onchange: function(){
 		new Ajax.Request('/games/' + $('character_game_id').value + '/game_details', {
 			method: 'get',
 			onSuccess: function(transport){
-				var details = transport.responseText.evalJSON();
-				if(!details.no_areas){
-					this.setup_area_info(details.areas);
+				this.details = transport.responseText.evalJSON();
+                if (this.details.no_servers){
+                    this.reset_area_info();
+                    this.reset_server_info();
+				}else if(!this.details.no_areas){
+					this.setup_area_info(this.details.areas);
 					this.area_onchange();
 				}else{
-					this.setup_server_info(details.servers);
+                    this.reset_area_info();
+					this.setup_server_info(this.details.servers);
 				}
-				this.setup_profession_info(details.professions);
-				this.setup_race_info(details.races);
+				this.setup_profession_info(this.details.professions);
+				this.setup_race_info(this.details.races);
 			}.bind(this)
 		});
 	},
@@ -176,7 +187,7 @@ ProfileManager = Class.create({
 	},
 
 	leave_new_character_info: function(){
-		this.ginfo_body = this.old_ginfo;
+		this.ginfo_body.innerHTML = this.old_ginfo;
 	},
 
 	create_character_info: function(){
@@ -216,7 +227,38 @@ ProfileManager = Class.create({
   },
 
   validate_character_info: function(){
-	  return true;
+  if($('character_name').value == ''){
+    error("人物昵称不能不添呀");
+    return false;
+  }
+  if($('character_level').value == ''){
+    error('等级不能不添啊');
+    return false
+  }
+  if($('character_game_id').value == ''){
+    error('没有选择游戏，如有问题，请看提示');
+  }
+  if(this.details.no_servers){
+    tip("由于游戏数量庞大，很多游戏已经停服，我们没有把所有游戏统计完成。这个游戏的资料就还不完全，请您在左边的意见／建议中告诉我们您所在游戏的所在服务器，我们会以最快速度为您添加。对您带来得不便，我们道歉。");
+    return false;
+  }
+  if(!this.details.no_areas && $('character_area_id').value == ''){
+    error('没有选择区域，如有问题，请看提示');
+    return false;
+  }
+  if($('character_server_id').value == ''){
+    error('没有选择服务器，如有问题，请看提示');
+    return false;
+  }
+  if(!this.details.no_races && $('character_race_id').value == ''){
+    error('没有选择种族');
+    return false;
+  }
+  if(!this.details.no_professions && $('character_profession_id').value == ''){
+    error('没有选择职业');
+    return false;
+  }
+  return true;
   },
 
   update_character_info: function(character_id){

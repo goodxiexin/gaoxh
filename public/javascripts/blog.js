@@ -1,6 +1,6 @@
 BlogBuilder = Class.create({
 
-  initialize: function(tag_builder){alert(tag_builder);
+  initialize: function(tag_builder){
     this.draft_id = 0;
     this.editor = new nicEditor({iconsPath:'/images/nicEditor/icons.gif'}).panelInstance('blog_content');
     this.form = $('blog_form');

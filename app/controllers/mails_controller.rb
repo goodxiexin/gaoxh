@@ -72,12 +72,12 @@ class MailsController < ApplicationController
 
   def read_multiple
     @mails.each { |mail| Mail.update_all("read_by_recipient = 1", {:parent_id => mail.parent_id, :recipient_id => current_user.id}) }
-    render :inline => "<%= \"totally #{current_user.recv_mails.count} mails \" %> | <%= \"#{current_user.unread_recv_mails.count} unread\" %>"
+    render :nothing => true
   end
 
   def unread_multiple
     @mails.each { |mail| Mail.update_all("read_by_recipient = 0", {:parent_id => mail.parent_id, :recipient_id => current_user.id}) }
-    render :inline => "<%= \"totally #{current_user.recv_mails.count} mails \" %> | <%= \"#{current_user.unread_recv_mails.count} unread\" %>"
+    render :nothing => true
   end
 
   def destroy_multiple
@@ -106,8 +106,6 @@ protected
       @mail = current_user.in_mails.find(params[:id])
     end
     @root_mail = @mail.parent    
-  rescue
-    not_found
   end
 
   def catch_mails

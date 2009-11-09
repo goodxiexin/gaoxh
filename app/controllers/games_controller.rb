@@ -3,11 +3,12 @@ class GamesController < ApplicationController
   before_filter :login_required, :setup
 
   def game_details
-		unless @game.no_areas?
-			render :json => {:no_areas => false, :areas => @game.areas, :professions => @game.professions, :races => @game.races}
-		else
-			render :json => {:no_areas => true, :servers => @game.servers, :professions => @game.professions, :races => @game.races}
-		end
+        if (@game.servers_count > 0)
+           @temp = false
+        else
+           @temp = true
+        end
+	    render :json => {:no_areas => @game.no_areas, :no_races => @game.no_races, :no_professions => @game.no_professions, :no_servers => @temp, :areas => @game.areas, :professions => @game.professions, :races => @game.races}
 	end
 
 	def area_details
