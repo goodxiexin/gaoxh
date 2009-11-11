@@ -1,0 +1,9 @@
+<div class='visitors'>
+  <h3>我关注： <%= link_to_function 'fold', "$('my_attention_list').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='my_attention_list'>
+  <% @game_attentions.each do |game_attention| %>
+    <% @game = Game.find(game_attention.game_id) %>
+    <p><%= @game.name %><%= @game.sale_date %><%= facebox_confirm 'x', attention_destroy_game_suggestions_url(:game_attention_id => game_attention.id), {:method => :delete, :msg => "你不关注这个游戏了么?"} %></p>
+  <% end %>
+  </div>
+</div>

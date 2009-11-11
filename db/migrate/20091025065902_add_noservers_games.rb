@@ -357,7 +357,7 @@ class AddNoserversGames < ActiveRecord::Migration
     gameno140 = Game.create(
       :name => "烽火情缘",
       :official_web => "http://fh.18day.com/index.aspx?fromurl=&iLevel=2&counterNumKey=click",
-      :sale_date => "",
+      :sale_date => "2007-2-18",
       :company => "",
       :agent => "",
       :no_races => true,
@@ -1149,7 +1149,7 @@ class AddNoserversGames < ActiveRecord::Migration
       :no_races => true,
       :no_professions => true,
       :description => "3D三国类角色扮演游戏")
-    gameno224.tag_list = "热血, 奇幻, 三国类, 即时战斗, 3D"
+    gameno224.tag_list = "热血, 奇幻, 三国, 即时战斗, 3D"
     gameno225 = Game.create(
       :name => "秦伤",
       :official_web => "http://qs.zhaouc.net/",
@@ -1298,7 +1298,7 @@ class AddNoserversGames < ActiveRecord::Migration
       :no_races => true,
       :no_professions => true,
       :description => "3D三国类角色扮演游戏")
-    gameno240.tag_list = "热血, 三国类, 即时战斗, 3D"
+    gameno240.tag_list = "热血, 三国, 即时战斗, 3D"
     gameno241 = Game.create(
       :name => "生肖外传",
       :official_web => "http://www.12ha.com/",

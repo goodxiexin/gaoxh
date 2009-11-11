@@ -1,0 +1,18 @@
+<% if games.blank? %>
+  没有符合您要求的新游戏
+<% else %>
+  <% games.each do |game| %>
+    <p>
+    <%= game.name %>
+    <% unless game.official_web.blank? %>
+      <%= link_to '官网', game.official_web, :popup => true %>
+    <% else %>
+      暂无官网
+    <% end %>
+    <%= game.company %>
+    <%= ftime2(game.sale_date) %>
+    <%= game.description %>
+    <div id="game_attention<%=game.id%>"><%= render :partial => 'attention', :locals => {:game => game } %></div>
+    </p>
+  <% end %>
+<% end %>

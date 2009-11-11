@@ -225,7 +225,7 @@ ActiveRecord::Schema.define(:version => 20091028163643) do
     t.string   "official_web"
     t.string   "company"
     t.string   "agent"
-    t.datetime "sale_date"
+    t.date     "sale_date"
     t.text     "description"
     t.boolean  "no_areas",          :default => false
     t.boolean  "no_races",          :default => false
@@ -528,6 +528,7 @@ ActiveRecord::Schema.define(:version => 20091028163643) do
 
   create_table "tags", :force => true do |t|
     t.string   "name"
+    t.string   "taggable_type"
     t.integer  "taggings_count", :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"

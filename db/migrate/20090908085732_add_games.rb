@@ -396,7 +396,7 @@ game39 = Game.create(
       :agent => "完美时空",
       :no_races => true,
       :description => "3D中国玄幻角色扮演游戏")
-      game39.tag_list = "轻松, 中国玄幻, 时间收费, 即时收费, 3D"
+      game39.tag_list = "轻松, 中国玄幻, 时间收费, 即时战斗, 3D"
       game39.save
 game40 = Game.create(
       :name => "SD敢达",
@@ -918,7 +918,7 @@ game90 = Game.create(
       :agent => "腾讯",
       :no_races => true,
       :description => "2D奇幻角色扮演")
-      game90.tag_list = "热血, 奇幻, 道具收费,　即时战斗, 2D"
+      game90.tag_list = "热血, 奇幻, 道具收费, 即时战斗, 2D"
       game90.save
 game91 = Game.create(
       :name => "王者世界",
@@ -967,7 +967,7 @@ game94 = Game.create(
 game95 = Game.create(
       :name => "勇气online",
       :official_web => "http://y.qwd1.com/",
-      :sale_date => "",
+      :sale_date => "2008-09-25",
       :company => "思开美琪",
       :agent => "趣味第一",
       :no_races => true,

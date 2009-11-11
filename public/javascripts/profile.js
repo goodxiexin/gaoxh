@@ -122,6 +122,11 @@ ProfileManager = Class.create({
     $('character_profession_id').innerHTML = html;
   },
 
+  setup_rating_info: function(rating){
+	    $('current_rate').innerHTML = "<li class='current-rating' style='width:"+ rating*30 +"px;'> Currently "+ rating +"/5 Stars.</li>";
+        $('star_value').innerHTML = "<input id='game_rate' type='hidden' value='"+ rating +"' name='game_rate'/>";
+  },
+
   setup_race_info: function(races){
     var html = '';
     for(var i=0;i<races.length;i++){
@@ -153,6 +158,7 @@ ProfileManager = Class.create({
                     this.reset_area_info();
 					this.setup_server_info(this.details.servers);
 				}
+                this.setup_rating_info(this.details.rating);
 				this.setup_profession_info(this.details.professions);
 				this.setup_race_info(this.details.races);
 			}.bind(this)
@@ -191,7 +197,7 @@ ProfileManager = Class.create({
 	},
 
 	create_character_info: function(){
-		if(this.validate_character_info()){
+		if(this.validate_character_info(true)){
 			new Ajax.Request('/characters/', {
 				method: 'post',
 				parameters: $('character_info_form').serialize(),
@@ -226,7 +232,7 @@ ProfileManager = Class.create({
 		this.ginfo_body.innerHTML = this.old_ginfo;
   },
 
-  validate_character_info: function(){
+  validate_character_info: function(new_data){
   if($('character_name').value == ''){
     error("人物昵称不能不添呀");
     return false;
@@ -238,16 +244,17 @@ ProfileManager = Class.create({
   if($('character_game_id').value == ''){
     error('没有选择游戏，如有问题，请看提示');
   }
+  if($('character_server_id').value == ''){
+    error('没有选择服务器，如有问题，请看提示');
+    return false;
+  }
+  if (new_data){
   if(this.details.no_servers){
     tip("由于游戏数量庞大，很多游戏已经停服，我们没有把所有游戏统计完成。这个游戏的资料就还不完全，请您在左边的意见／建议中告诉我们您所在游戏的所在服务器，我们会以最快速度为您添加。对您带来得不便，我们道歉。");
     return false;
   }
   if(!this.details.no_areas && $('character_area_id').value == ''){
     error('没有选择区域，如有问题，请看提示');
-    return false;
-  }
-  if($('character_server_id').value == ''){
-    error('没有选择服务器，如有问题，请看提示');
     return false;
   }
   if(!this.details.no_races && $('character_race_id').value == ''){
@@ -258,11 +265,12 @@ ProfileManager = Class.create({
     error('没有选择职业');
     return false;
   }
+  }
   return true;
   },
 
   update_character_info: function(character_id){
-    if(this.validate_character_info()){
+    if(this.validate_character_info(false)){
       new Ajax.Request('/characters/' + character_id , {
         method: 'put',
         parameters: $('character_info_form').serialize(),

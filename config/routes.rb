@@ -49,6 +49,11 @@ ActionController::Routing::Routes.draw do |map|
 	map.resources :characters
 
   #
+  # game suggestions
+  #
+  map.resources :game_suggestions, :collection => {:game_tags => :get, :attention_destroy => :delete}
+
+  #
   # statuses
   #
   map.resources :statuses, :controller => 'status/statuses' do |statuses|

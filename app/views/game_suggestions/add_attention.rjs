@@ -1,0 +1,1 @@
+page.replace_html "game_attention#{@game.id}", :partial => 'attention', :locals => { :game => @game }

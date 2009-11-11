@@ -8,7 +8,7 @@ class GamesController < ApplicationController
         else
            @temp = true
         end
-	    render :json => {:no_areas => @game.no_areas, :no_races => @game.no_races, :no_professions => @game.no_professions, :no_servers => @temp, :areas => @game.areas, :professions => @game.professions, :races => @game.races}
+	    render :json => {:no_areas => @game.no_areas, :no_races => @game.no_races, :no_professions => @game.no_professions, :no_servers => @temp, :areas => @game.areas, :professions => @game.professions, :races => @game.races, :rating => @game.get_rating_from_user(current_user)}
 	end
 
 	def area_details

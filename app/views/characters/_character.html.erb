@@ -3,6 +3,14 @@
 	<div>
   <p><%= label_tag '', '等级: '%><%= character.level %></p>
   <p><%= label_tag '', '游戏: '%><%= character.game.name %></p>
+  <p><%= label_tag '', '您的评分'%>
+  <% rating = character.game.get_rating_from_user(current_user) %>
+<ul class='star-rating'>
+   <li class='current-rating' style='width:<%= (rating * 30).to_i -%>px;'>
+          Currently <%= rating %>/5 Stars.
+    </li>
+</ul>
+  </p>
   <% unless character.game.no_areas %>
     <p><%= label_tag '', '区域: '%><%= character.area.name %></p>
   <% end %>

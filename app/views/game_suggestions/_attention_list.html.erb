@@ -1,0 +1,8 @@
+<div class='visitors'>
+  <h3>关注榜 <%= link_to_function 'fold', "$('attention_list').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='attention_list'>
+  <% @game_list.each do |game| %>
+    <li><%= game.name %></li>
+  <% end %>
+  </div>
+</div>

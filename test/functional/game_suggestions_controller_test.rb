@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ActsAsTaggableTest < ActiveSupport::TestCase
+class GameSuggestionsControllerTest < ActionController::TestCase
   # Replace this with your real tests.
   test "the truth" do
     assert true

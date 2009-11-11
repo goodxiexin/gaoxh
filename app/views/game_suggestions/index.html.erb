@@ -1,0 +1,20 @@
+<% content_for :right do %>
+  <%= render :partial => 'my_game_attentions' %>
+  <%= render :partial => 'attention_list' %>
+  <%= render :partial => 'recent_beta_list' %>
+<% end %>
+
+<h3>您想玩什么样的游戏？</h3>
+<p>
+  <%= text_field :the_game, :tags, :size => 50 %>
+  <%= button_to_function "推荐", "show_tagged_games()" %>
+</p>
+如果只想我们推荐比较新的游戏请点这<%= check_box_tag 'new_game' %>
+<h3>点击您想要的游戏特点后，点击推荐按钮，我们会给您推荐游戏</h3>
+  <% @game_tags.each do |tag| %>
+  <div id=<%= 'game_tag_element_' + String(tag.id) %>, onclick='select_game_tag("<%= tag.name %>")'> 
+    <%= tag.name %>
+  </div>
+<% end %> 
+<div id="game_suggestion_area">
+</div>

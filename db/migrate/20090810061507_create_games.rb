@@ -5,7 +5,7 @@ class CreateGames < ActiveRecord::Migration
       t.string :official_web
       t.string :company
       t.string :agent
-      t.datetime :sale_date
+      t.date :sale_date
       t.text :description
       t.boolean :no_areas, :default => false
       t.boolean :no_races, :default => false

@@ -1,0 +1,8 @@
+<div class='visitors'>
+  <h3>最近测试 <%= link_to_function 'fold', "$('beta_list').toggle();if(this.innerHTML == 'fold') this.update('unfold'); else this.update('fold');", :class => 'hide-all'%></h3>
+  <div id='beta_list'>
+  <% @beta_list.each do |game| %>
+    <li><%= game.name %>  <%= ftime2(game.sale_date) %></li>
+  <% end %>
+  </div>
+</div>

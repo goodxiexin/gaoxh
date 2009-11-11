@@ -25,6 +25,16 @@ class User < ActiveRecord::Base
     end.sort {|a,b| b.created_at <=> a.created_at }
   end
 
+  def interested_in_game?(game)
+    rtn = false
+    self.game_attentions.each do |ga|
+      rtn = true if ga.game_id == game.id
+    end
+    rtn
+  end
+
+    has_many :game_attentions
+
 	# notifications
 	has_many :notifications
 
